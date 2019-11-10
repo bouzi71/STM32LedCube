@@ -49,6 +49,50 @@ void CCubeController::Update()
 }
 
 
+
+//
+// ICubeController
+//
+void CCubeController::BlinkYellowLed()
+{
+	if (HAL_GPIO_ReadPin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin) == GPIO_PIN_SET)
+		return;
+
+	HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_SET);
+	HAL_Delay(1);
+	HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_RESET);
+}
+
+void CCubeController::BlinkBlueLed()
+{
+	if (HAL_GPIO_ReadPin(LED_BLUE_GPIO_Port, LED_BLUE_Pin) == GPIO_PIN_SET)
+		return;
+
+	HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_SET);
+	HAL_Delay(1);
+	HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_RESET);
+}
+
+
+void CCubeController::GoToErrorState()
+{
+	while(true)
+	{
+		HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_SET);
+		HAL_Delay(200);
+		HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_SET);
+		HAL_Delay(200);
+		HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_RESET);
+	}
+}
+
+IMatrixAccess* CCubeController::GetMatrix()
+{
+	return this;
+}
+
+
 //
 // IMatrixAccess
 //
@@ -119,28 +163,36 @@ void CCubeController::ProcessInput()
 	bool btnYellowPressed = (HAL_GPIO_ReadPin(BTN_YELLOW_GPIO_Port, BTN_YELLOW_Pin) == GPIO_PIN_RESET);
 	bool btnBluePressed   = (HAL_GPIO_ReadPin(BTN_BLUE_GPIO_Port,   BTN_BLUE_Pin  ) == GPIO_PIN_RESET);
 
-	if (m_BtnYellowPressed && !btnYellowPressed)
+	if (m_BtnYellowPressed != btnYellowPressed)
 	{
-		m_BtnYellowPressed = btnYellowPressed;
+		if (btnYellowPressed)
+		{
+			HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_SET);
+		}
 
-		HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_SET);
-		BtnYellowClick();
-		HAL_Delay(100);
-		HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_RESET);
+		if (!btnYellowPressed)
+		{
+			HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_RESET);
 
-		return;
+			BtnYellowClick();
+			HAL_Delay(100);
+		}
 	}
 
-	if (m_BtnBluePressed && !btnBluePressed)
+	if (m_BtnBluePressed != btnBluePressed)
 	{
-		m_BtnBluePressed = btnBluePressed;
+		if (btnBluePressed)
+		{
+			HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_SET);
+		}
 
-		HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_SET);
-		BtnBlueClick();
-		HAL_Delay(100);
-		HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_RESET);
+		if (!btnBluePressed)
+		{
+			HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_RESET);
 
-		return;
+			BtnBlueClick();
+			HAL_Delay(100);
+		}
 	}
 
 	m_BtnYellowPressed = btnYellowPressed;
@@ -182,7 +234,6 @@ void CCubeController::ProcessFrame()
 
 	m_Frame++;
 }
-
 
 void CCubeController::DrawMatrix()
 {

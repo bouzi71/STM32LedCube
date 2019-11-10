@@ -8,11 +8,18 @@
 
 
 class CCubeController
-		: public IMatrixAccess
+		: public ICubeController
+		, public IMatrixAccess
 {
 public:
 	void                                            Initialize();
 	void 											Update();
+
+	// ICubeController
+	void                                            BlinkYellowLed() override;
+	void                                            BlinkBlueLed() override;
+	void                                            GoToErrorState() override;
+	IMatrixAccess *                                 GetMatrix() override;
 
 	// IMatrixAccess
 	void 											Clear() override;

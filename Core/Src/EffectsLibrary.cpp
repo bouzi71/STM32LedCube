@@ -3,7 +3,8 @@
 #include <EffectsLibrary.h>
 
 // Additional
-#include <EffectsEngine.h>
+#include <Effect.h>
+#include <EffectsCollection.h>
 
 //
 // SNAKE
@@ -11,8 +12,8 @@
 class CEffectSnake : public CEffect
 {
 public:
-	CEffectSnake(IMatrixAccess * MatrixAccess)
-		: CEffect(EFrameFuncPeriod_3, 65, MatrixAccess)
+	CEffectSnake(ICubeController * CubeController)
+		: CEffect(EFrameFuncPeriod_3, 65, CubeController)
 	{}
 
 	void FuncFrame(uint32_t Frame) override final
@@ -54,8 +55,8 @@ private:
 class CEffectSpiral : public CEffect
 {
 public:
-	CEffectSpiral(IMatrixAccess * MatrixAccess)
-		: CEffect(EFrameFuncPeriod_3, 79, MatrixAccess)
+	CEffectSpiral(ICubeController * CubeController)
+		: CEffect(EFrameFuncPeriod_3, 79, CubeController)
 	{}
 
 	void FuncInit() override final
@@ -78,7 +79,7 @@ public:
 	void FuncFrame(uint32_t Frame) override final
 	{
 		for (uint32_t z = 0; z < 8; z++)
-			m_MatrixAccess->SetPixel(posX, posY, z);
+			SET_PIXEL(posX, posY, z);
 
 		switch (napr)
 		{
@@ -160,8 +161,8 @@ private:
 class CEffectPlanes : public CEffect
 {
 public:
-	CEffectPlanes(IMatrixAccess * MatrixAccess)
-		: CEffect(EFrameFuncPeriod_5, 16, MatrixAccess)
+	CEffectPlanes(ICubeController * CubeController)
+		: CEffect(EFrameFuncPeriod_5, 16, CubeController)
 	{}
 
 	void FuncFrame(uint32_t Frame) override final
@@ -183,8 +184,8 @@ public:
 class CEffectExpandCubeToBorder : public CEffect
 {
 public:
-	CEffectExpandCubeToBorder(IMatrixAccess * MatrixAccess)
-		: CEffect(EFrameFuncPeriod_5, 4, MatrixAccess)
+	CEffectExpandCubeToBorder(ICubeController * CubeController)
+		: CEffect(EFrameFuncPeriod_5, 4, CubeController)
 	{}
 
 	void FuncFrame(uint32_t Frame) override final
@@ -199,8 +200,8 @@ public:
 class CEffectCollapseCubeTo777 : public CEffect
 {
 public:
-	CEffectCollapseCubeTo777(IMatrixAccess * MatrixAccess)
-		: CEffect(EFrameFuncPeriod_5, 8, MatrixAccess)
+	CEffectCollapseCubeTo777(ICubeController * CubeController)
+		: CEffect(EFrameFuncPeriod_5, 8, CubeController)
 	{}
 
 	void FuncFrame(uint32_t Frame) override final
@@ -215,8 +216,8 @@ public:
 class CEffectExpandCubeFrom777To000 : public CEffect
 {
 public:
-	CEffectExpandCubeFrom777To000(IMatrixAccess * MatrixAccess)
-		: CEffect(EFrameFuncPeriod_5, 8, MatrixAccess)
+	CEffectExpandCubeFrom777To000(ICubeController * CubeController)
+		: CEffect(EFrameFuncPeriod_5, 8, CubeController)
 	{}
 
 	void FuncFrame(uint32_t Frame) override final
@@ -231,8 +232,8 @@ public:
 class CEffectCollapseCubeFrom777To000 : public CEffect
 {
 public:
-	CEffectCollapseCubeFrom777To000(IMatrixAccess * MatrixAccess)
-		: CEffect(EFrameFuncPeriod_5, 8, MatrixAccess)
+	CEffectCollapseCubeFrom777To000(ICubeController * CubeController)
+		: CEffect(EFrameFuncPeriod_5, 8, CubeController)
 	{}
 
 	void FuncFrame(uint32_t Frame) override final
@@ -247,8 +248,8 @@ public:
 class CEffectExpandCubeFrom000To777 : public CEffect
 {
 public:
-	CEffectExpandCubeFrom000To777(IMatrixAccess * MatrixAccess)
-		: CEffect(EFrameFuncPeriod_5, 8, MatrixAccess)
+	CEffectExpandCubeFrom000To777(ICubeController * CubeController)
+		: CEffect(EFrameFuncPeriod_5, 8, CubeController)
 	{}
 
 	void FuncFrame(uint32_t Frame) override final
@@ -263,8 +264,8 @@ public:
 class CEffectCollapseCubeFromToCenter : public CEffect
 {
 public:
-	CEffectCollapseCubeFromToCenter(IMatrixAccess * MatrixAccess)
-		: CEffect(EFrameFuncPeriod_5, 4, MatrixAccess)
+	CEffectCollapseCubeFromToCenter(ICubeController * CubeController)
+		: CEffect(EFrameFuncPeriod_5, 4, CubeController)
 	{}
 
 	void FuncFrame(uint32_t Frame) override final
@@ -276,18 +277,25 @@ public:
 
 // -------------------------------------------------------------------
 
-void AddEffects(std::shared_ptr<IEffectsCollection> Collection, IMatrixAccess * MatrixAccess)
+void AddEffects(std::shared_ptr<IEffectsCollection> Collection, ICubeController * CubeController)
 {
-	std::shared_ptr<CEffectsCollection> cubeEffectCollection = std::make_shared<CEffectsCollection>(MatrixAccess);
-	cubeEffectCollection->AddEffect(std::make_shared<CEffectExpandCubeToBorder>(MatrixAccess));
-	cubeEffectCollection->AddEffect(std::make_shared<CEffectCollapseCubeTo777>(MatrixAccess));
-	cubeEffectCollection->AddEffect(std::make_shared<CEffectExpandCubeFrom777To000>(MatrixAccess));
-	cubeEffectCollection->AddEffect(std::make_shared<CEffectCollapseCubeFrom777To000>(MatrixAccess));
-	cubeEffectCollection->AddEffect(std::make_shared<CEffectExpandCubeFrom000To777>(MatrixAccess));
-	cubeEffectCollection->AddEffect(std::make_shared<CEffectCollapseCubeFromToCenter>(MatrixAccess));
+	std::shared_ptr<CEffectsCollection> cubeEffectCollection = std::make_shared<CEffectsCollection>(CubeController);
+	cubeEffectCollection->AddEffect(std::make_shared<CEffectExpandCubeToBorder>(CubeController));
+	cubeEffectCollection->AddEffect(std::make_shared<CEffectCollapseCubeTo777>(CubeController));
+	cubeEffectCollection->AddEffect(std::make_shared<CEffectExpandCubeFrom777To000>(CubeController));
+	cubeEffectCollection->AddEffect(std::make_shared<CEffectCollapseCubeFrom777To000>(CubeController));
+	cubeEffectCollection->AddEffect(std::make_shared<CEffectExpandCubeFrom000To777>(CubeController));
+	cubeEffectCollection->AddEffect(std::make_shared<CEffectCollapseCubeFromToCenter>(CubeController));
 	Collection->AddEffect(cubeEffectCollection);
-
-	Collection->AddEffect(std::make_shared<CEffectPlanes>(MatrixAccess));
-	Collection->AddEffect(std::make_shared<CEffectSpiral>(MatrixAccess));
-	Collection->AddEffect(std::make_shared<CEffectSnake>(MatrixAccess));
+	Collection->AddEffect(cubeEffectCollection);
+	Collection->AddEffect(cubeEffectCollection);
+	Collection->AddEffect(cubeEffectCollection);
+	Collection->AddEffect(cubeEffectCollection);
+	Collection->AddEffect(cubeEffectCollection);
+	Collection->AddEffect(cubeEffectCollection);
+	Collection->AddEffect(cubeEffectCollection);
+	Collection->AddEffect(cubeEffectCollection);
+	Collection->AddEffect(std::make_shared<CEffectPlanes>(CubeController));
+	Collection->AddEffect(std::make_shared<CEffectSpiral>(CubeController));
+	Collection->AddEffect(std::make_shared<CEffectSnake>(CubeController));
 }

@@ -4,6 +4,8 @@
 #include <stm32f1xx_hal.h>
 
 #include <memory>
+#include <cstring>
+
 
 class IMatrixAccess
 {
@@ -14,6 +16,15 @@ public:
 	virtual void ClearPixel(uint8_t x, uint8_t y, uint8_t z) = 0;
 	virtual void TogglePixel(uint8_t x, uint8_t y, uint8_t z) = 0;
 	virtual bool GetPixel(uint8_t x, uint8_t y, uint8_t z) const = 0;
+};
+
+class ICubeController
+{
+public:
+	virtual void BlinkYellowLed() = 0;
+	virtual void BlinkBlueLed() = 0;
+	virtual void GoToErrorState() = 0;
+	virtual IMatrixAccess * GetMatrix() = 0;
 };
 
 /*
@@ -44,8 +55,12 @@ public:
 
 	virtual void 									InvokeFuncFrame(EFrameFuncPeriod FramePeriod, uint32_t Frame) = 0;
 
-	virtual EFrameFuncPeriod 						GetFramePeriod() const  = 0;
+	virtual EFrameFuncPeriod 						GetFramePeriod() const = 0;
+	virtual void             						SetFramePeriod(EFrameFuncPeriod Period) = 0;
 	virtual uint32_t 								GetLenght() const = 0;
+	virtual void                                    SetLenght(uint32_t Value) = 0;
+	virtual uint32_t                                GetRepeatCount() const = 0;
+	virtual void                                    SetRepeatCount(uint32_t Value) = 0;
 	virtual bool 									IsNeedClearBeforeInit() const = 0;
 	virtual bool 									IsNeedClearBeforeFrame() const = 0;
 };
