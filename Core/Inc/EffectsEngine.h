@@ -33,6 +33,9 @@ protected:
 	void 											Cube(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd);
 	void 											CubeOutline(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd);
 
+	void                                            SetClearBeforeInit(bool Value);
+	void                                            SetClearBeforeFrame(bool Value);
+
 #define SET_PIXEL(x, y, z)     (m_MatrixAccess->SetPixel(x, y, z));
 #define CLEAR_PIXEL(x, y, z)   (m_MatrixAccess->ClearPixel(x, y, z));
 #define TOGGLE_PIXEL(x, y, z)  (m_MatrixAccess->TogglePixel(x, y, z));

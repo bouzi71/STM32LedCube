@@ -97,7 +97,15 @@ void CEffect::CubeOutline(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint3
 					SET_PIXEL(x, y, z);
 }
 
+void CEffect::SetClearBeforeInit(bool Value)
+{
+	m_CleanCubeBeforeInit = Value;
+}
 
+void CEffect::SetClearBeforeFrame(bool Value)
+{
+	m_CleanCubeBeforeFrame = Value;
+}
 
 //
 // CEffectsCollection
@@ -223,3 +231,4 @@ void CEffectsEngine::InvokeFuncFrame(EFrameFuncPeriod FramePeriod)
 {
 	m_RootCollection->InvokeFuncFrame(FramePeriod, UINT32_MAX);
 }
+

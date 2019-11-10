@@ -28,7 +28,7 @@ public:
 			uint8_t x = i / 8;
 			uint8_t y = i % 8;
 
-			for (uint8_t z = 0; z < 1; z++)
+			for (uint8_t z = 0; z < 7; z++)
 			{
 				if (x % 2 == 0)
 				{
@@ -70,6 +70,9 @@ public:
 
 		posX = minX;
 		posY = minY;
+
+		SetClearBeforeInit(true);
+		SetClearBeforeFrame(false);
 	}
 
 	void FuncFrame(uint32_t Frame) override final
