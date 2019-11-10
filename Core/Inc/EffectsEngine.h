@@ -1,9 +1,9 @@
 #ifndef __EFFECTSENGINE_H
 #define __EFFECTSENGINE_H
 
-#include "stm32f1xx_hal.h"
+#include <stm32f1xx_hal.h>
 
-#include "MatrixAccess.h"
+#include <MatrixAccess.h>
 #include <vector>
 
 //
@@ -19,6 +19,11 @@ enum EFrameFuncType
 	EFrameFuncType60 = 60
 };
 
+
+
+//
+// CEffect
+//
 class CEffect
 {
 public:
@@ -29,6 +34,14 @@ public:
 	virtual void									FuncFrame(uint32_t Frame);
 
 	bool											IsPlaying() const;
+
+
+protected:
+	void 											PlaneX(uint32_t plane);
+	void 											PlaneY(uint32_t plane);
+	void 											PlaneZ(uint32_t plane);
+	void 											Cube(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd);
+	void 											CubeOutline(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd);
 
 private:
 	EFrameFuncType									m_FrameFuncType;
@@ -43,6 +56,10 @@ private:
 };
 
 
+
+//
+// CEffectsEngine
+//
 class CEffectsEngine
 {
 public:
@@ -50,7 +67,7 @@ public:
 
 	void											RepeatCurrentEffect();
 	void											NextEffect();
-	void											CallFrameFunc(CEffect* Effect);
+	void											CallFrameFunc(uint32_t NFrame);
 
 private: // Methods
 

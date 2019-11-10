@@ -1,65 +1,11 @@
 
 // General
 #include <EffectsEngine.h>
+
+// Additional
 #include <string.h>
 
-// Defines
-#define EFFECT_COUNT   7
-#define SET_PIXEL(x, y, z)     (m_Matrix[y][z] |=  (0x01 << (x)));
-#define CLEAR_PIXEL(x, y, z)   (m_Matrix[y][z] &= ~(0x01 << (x)));
-#define TOGGLE_PIXEL(x, y, z)  (m_Matrix[y][z] ^=  (0x01 << (x)));
-#define GET_PIXEL(x, y, z)     ((m_Matrix[y][z] & (0x01 << (x))) == (0x01 << (x)))
-
-
-// Effect engine
-SEffectDescription g_AllEffects[EFFECT_COUNT];
-uint32_t g_CurrentEffectNumber = 0;
-SEffectDescription* g_CurrentEffect = NULL;
-
-void Fill(uint8_t value)
-{
-	memset(&m_Matrix[0][0], value, 64);
-}
-
-void PlaneX(uint32_t plane)
-{
-	for (uint32_t y = 0; y < 8; y++)
-		for (uint32_t z = 0; z < 8; z++)
-			SET_PIXEL(plane, y, z);
-}
-
-void PlaneY(uint32_t plane)
-{
-	for (int x = 0; x < 8; x++)
-		for (uint32_t z = 0; z < 8; z++)
-			SET_PIXEL(x, plane, z);
-}
-
-void PlaneZ(uint32_t plane)
-{
-	for (uint32_t x = 0; x < 8; x++)
-		for (uint32_t y = 0; y < 8; y++)
-			SET_PIXEL(x, y, plane);
-}
-
-void Cube(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd)
-{
-	for (uint32_t x = xBegin; x <= xEnd; x++)
-		for (uint32_t y = yBegin; y <= yEnd; y++)
-			for (uint32_t z = zBegin; z <= zEnd; z++)
-				SET_PIXEL(x, y, z);
-}
-
-
-void CubeOutline(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd)
-{
-	for (uint32_t x = xBegin; x <= xEnd; x++)
-		for (uint32_t y = yBegin; y <= yEnd; y++)
-			for (uint32_t z = zBegin; z <= zEnd; z++)
-				if (x == xBegin || x == xEnd || y == yBegin || y == yEnd || z == zBegin || z == zEnd)
-					SET_PIXEL(x, y, z);
-}
-
+/*
 
 void DrawSnakeT(uint8_t maxVal)
 {
@@ -103,48 +49,6 @@ void DrawSnake111(uint32_t frame)
 {
 	DrawSnakeT(frame % 65);
 }
-
-
-
-// Cube BEGIN
-void DrawCubeFromCenterToBorder(uint32_t frame)
-{
-	uint32_t t = frame % 4;
-	CubeOutline(3 - t, 4 + t, 3 - t, 4 + t, 3 - t, 4 + t);
-}
-
-void DrawCubeFromBorderToCenter(uint32_t frame)
-{
-	uint32_t t = frame % 4;
-	t = 3 - t;
-
-	CubeOutline(3 - t, 4 + t, 3 - t, 4 + t, 3 - t, 4 + t);
-}
-
-void DrawCube222(uint32_t frame)
-{
-	uint32_t t = frame % 8;
-	CubeOutline(0, t, 0, t, 0, t);
-}
-
-void DrawCube333(uint32_t frame)
-{
-	uint32_t t = frame % 8;
-	CubeOutline(t, 7, t, 7, t, 7);
-}
-
-void DrawCube444(uint32_t frame)
-{
-	uint32_t t = frame % 8;
-	CubeOutline(7 - t, 7, 7 - t, 7, 7 - t, 7);
-}
-
-void DrawCube555(uint32_t frame)
-{
-	uint32_t t = frame % 8;
-	CubeOutline(0, 7 - t , 0, 7 - t, 0, 7 - t);
-}
-// Cube END
 
 
 
@@ -232,6 +136,8 @@ void FrameSpiral(uint32_t frame)
 	}
 }
 
+*/
+
 
 //
 // Private
@@ -278,6 +184,107 @@ void TryShowNextEffect()
 
 
 
+
+// -------------------------------------------------------------------
+
+class CEffectExpandCubeToBorder : public CEffect
+{
+public:
+	CEffectExpandCubeToBorder(IMatrixAccess * MatrixAccess)
+		: CEffect(EFrameFuncType5, 4, MatrixAccess)
+	{}
+
+	void FuncFrame(uint32_t Frame) override final
+	{
+		uint32_t t = Frame % 4;
+		CubeOutline(3 - t, 4 + t, 3 - t, 4 + t, 3 - t, 4 + t);
+	}
+};
+
+// -------------------------------------------------------------------
+
+class CEffectCollapseCubeTo777 : public CEffect
+{
+public:
+	CEffectCollapseCubeTo777(IMatrixAccess * MatrixAccess)
+		: CEffect(EFrameFuncType5, 8, MatrixAccess)
+	{}
+
+	void FuncFrame(uint32_t Frame) override final
+	{
+		uint32_t t = Frame % 8;
+		CubeOutline(t, 7, t, 7, t, 7);
+	}
+};
+
+// -------------------------------------------------------------------
+
+class CEffectExpandCubeFrom777To000 : public CEffect
+{
+public:
+	CEffectExpandCubeFrom777To000(IMatrixAccess * MatrixAccess)
+		: CEffect(EFrameFuncType5, 8, MatrixAccess)
+	{}
+
+	void FuncFrame(uint32_t Frame) override final
+	{
+		uint32_t t = Frame % 8;
+		CubeOutline(7 - t, 7, 7 - t, 7, 7 - t, 7);
+	}
+};
+
+// -------------------------------------------------------------------
+
+class CEffectCollapseCubeFrom777To000 : public CEffect
+{
+public:
+	CEffectCollapseCubeFrom777To000(IMatrixAccess * MatrixAccess)
+		: CEffect(EFrameFuncType5, 8, MatrixAccess)
+	{}
+
+	void FuncFrame(uint32_t Frame) override final
+	{
+		uint32_t t = Frame % 8;
+		CubeOutline(0, 7 - t , 0, 7 - t, 0, 7 - t);
+	}
+};
+
+// -------------------------------------------------------------------
+
+class CEffectExpandCubeFrom000To777 : public CEffect
+{
+public:
+	CEffectExpandCubeFrom000To777(IMatrixAccess * MatrixAccess)
+		: CEffect(EFrameFuncType5, 8, MatrixAccess)
+	{}
+
+	void FuncFrame(uint32_t Frame) override final
+	{
+		uint32_t t = Frame % 8;
+		CubeOutline(0, t, 0, t, 0, t);
+	}
+};
+
+// -------------------------------------------------------------------
+
+class CEffectCollapseCubeFromToCenter : public CEffect
+{
+public:
+	CEffectCollapseCubeFromToCenter(IMatrixAccess * MatrixAccess)
+		: CEffect(EFrameFuncType5, 4, MatrixAccess)
+	{}
+
+	void FuncFrame(uint32_t Frame) override final
+	{
+		uint32_t t = 3 - (Frame % 4);
+		CubeOutline(3 - t, 4 + t, 3 - t, 4 + t, 3 - t, 4 + t);
+	}
+};
+
+// -------------------------------------------------------------------
+
+
+
 //
 // CEffect
 //
@@ -305,8 +312,53 @@ void CEffect::FuncFrame(uint32_t /*Frame*/)
 
 bool CEffect::IsPlaying() const
 {
-	return CurrentFrame < Lenght;
+	return m_CurrentFrame < m_Lenght;
 }
+
+
+
+//
+// Protected
+//
+void CEffect::PlaneX(uint32_t plane)
+{
+	for (uint32_t y = 0; y < 8; y++)
+		for (uint32_t z = 0; z < 8; z++)
+			m_MatrixAccess->SetPixel(plane, y, z);
+}
+
+void CEffect::PlaneY(uint32_t plane)
+{
+	for (uint32_t x = 0; x < 8; x++)
+		for (uint32_t z = 0; z < 8; z++)
+			m_MatrixAccess->SetPixel(x, plane, z);
+}
+
+void CEffect::PlaneZ(uint32_t plane)
+{
+	for (uint32_t x = 0; x < 8; x++)
+		for (uint32_t y = 0; y < 8; y++)
+			m_MatrixAccess->SetPixel(x, y, plane);
+}
+
+void CEffect::Cube(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd)
+{
+	for (uint32_t x = xBegin; x <= xEnd; x++)
+		for (uint32_t y = yBegin; y <= yEnd; y++)
+			for (uint32_t z = zBegin; z <= zEnd; z++)
+				m_MatrixAccess->SetPixel(x, y, z);
+}
+
+
+void CEffect::CubeOutline(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd)
+{
+	for (uint32_t x = xBegin; x <= xEnd; x++)
+		for (uint32_t y = yBegin; y <= yEnd; y++)
+			for (uint32_t z = zBegin; z <= zEnd; z++)
+				if (x == xBegin || x == xEnd || y == yBegin || y == yEnd || z == zBegin || z == zEnd)
+					m_MatrixAccess->SetPixel(x, y, z);
+}
+
 
 
 //
@@ -367,7 +419,7 @@ void CEffectsEngine::NextEffect()
 	ForceShowNextEffect();
 }
 
-void CEffectsEngine::CallFrameFunc(CEffect* Effect)
+void CEffectsEngine::CallFrameFunc(uint32_t NFrame)
 {
 	if (Effect->CleanCubeBeforeFrame)
 		m_MatrixAccess->Clear();

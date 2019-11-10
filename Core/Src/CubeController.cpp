@@ -1,12 +1,11 @@
 
 // General
-#include <EffectsEngine.h>
-#include "CubeController.h"
+#include <CubeController.h>
 
 // Additional
 #include <string.h>
-#include "main.h"
-#include "spi.h"
+#include <main.h>
+#include <spi.h>
 
 // Defines
 #define ONE_FRAME_TIME (1000 / 60)
@@ -55,7 +54,7 @@ void CCubeController::BtnBlueClick()
 {
 	HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
 
-	m_EffectsEngine.NextEffect()();
+	m_EffectsEngine.NextEffect();
 }
 
 
@@ -111,33 +110,33 @@ bool CCubeController::NextFramePresent()
 void CCubeController::ProcessFrame()
 {
 	// On 1 frame
-	OnNFrames(1);
+	m_EffectsEngine.CallFrameFunc(1);
 
 	// On 3 frames
 	if (m_Frame >= m_Next3FramesEventCntr)
 	{
-		OnNFrames(3);
+		m_EffectsEngine.CallFrameFunc(3);
 		m_Next3FramesEventCntr += 3;
 	}
 
 	// On 5 frames
 	if (m_Frame >= m_Next5FramesEventCntr)
 	{
-		OnNFrames(5);
+		m_EffectsEngine.CallFrameFunc(5);
 		m_Next5FramesEventCntr += 5;
 	}
 
 	// On 10 frames
 	if (m_Frame >= m_Next10FramesEventCntr)
 	{
-		OnNFrames(10);
+		m_EffectsEngine.CallFrameFunc(10);
 		m_Next10FramesEventCntr += 10;
 	}
 
 	// On 60 frames
 	if (m_Frame >= m_Next60FramesEventCntr)
 	{
-		OnNFrames(60);
+		m_EffectsEngine.CallFrameFunc(60);
 		m_Next60FramesEventCntr += 60;
 	}
 
@@ -158,9 +157,4 @@ void CCubeController::DrawMatrix()
 
 		HAL_GPIO_WritePin(CUBE_CS_GPIO_Port, CUBE_CS_Pin, GPIO_PIN_SET);
 	}
-}
-
-void CCubeController::OnNFrames(uint32_t N)
-{
-	m_EffectsEngine.CallFrameFunc(N);
 }

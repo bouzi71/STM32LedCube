@@ -1,7 +1,7 @@
 #ifndef __CUBECONTROLLER_H
 #define __CUBECONTROLLER_H
 
-#include "stm32f1xx_hal.h"
+#include <stm32f1xx_hal.h>
 
 #include <MatrixAccess.h>
 #include <EffectsEngine.h>
@@ -29,17 +29,18 @@ private: // Methods
 
 	void 											ProcessFrame();
 	void 											DrawMatrix();
-	void 											OnNFrames(uint32_t N);
 
 private: // Variables
 	uint8_t 										m_Matrix[8][8];
 
+	// Frame processor
 	uint32_t 										m_Frame;
 	uint32_t 										m_Next3FramesEventCntr;
 	uint32_t 										m_Next5FramesEventCntr;
 	uint32_t 										m_Next10FramesEventCntr;
 	uint32_t 										m_Next60FramesEventCntr;
 
+	// Delay between frames
 	uint32_t 										m_DelayEnd;
 
 	CEffectsEngine 									m_EffectsEngine;
