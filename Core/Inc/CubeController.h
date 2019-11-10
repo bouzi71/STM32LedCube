@@ -2,11 +2,13 @@
 #define __CUBECONTROLLER_H
 
 #include <stm32f1xx_hal.h>
+#include <memory>
 
 #include <MatrixAccess.h>
 #include <EffectsEngine.h>
 
-class CCubeController : public IMatrixAccess
+class CCubeController
+		: public IMatrixAccess
 {
 public:
 	CCubeController();
@@ -43,7 +45,7 @@ private: // Variables
 	// Delay between frames
 	uint32_t 										m_DelayEnd;
 
-	CEffectsEngine 									m_EffectsEngine;
+	std::shared_ptr<CEffectsEngine> 				m_EffectsEngine;
 };
 
 #endif

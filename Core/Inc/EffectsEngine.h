@@ -2,14 +2,14 @@
 #define __EFFECTSENGINE_H
 
 #include <stm32f1xx_hal.h>
+#include <memory>
+#include <vector>
 
 #include <MatrixAccess.h>
-#include <vector>
 
 //
 // Types
 //
-
 enum EFrameFuncType
 {
 	EFrameFuncType1 = 1,
@@ -33,8 +33,16 @@ public:
 	virtual void									FuncInit();
 	virtual void									FuncFrame(uint32_t Frame);
 
-	bool											IsPlaying() const;
+	void                                            Reset();
+	void                                            IncCurrentFrame();
 
+	EFrameFuncType                                  GetFrameFuncType() const;
+	uint32_t                                        GetCurrentFrame() const;
+	uint32_t                                        GetLenght() const;
+
+	bool											IsPlaying() const;
+	bool                                            IsNeedClearBeforeInit() const;
+	bool                                            IsNeedClearBeforeFrame() const;
 
 protected:
 	void 											PlaneX(uint32_t plane);
@@ -70,11 +78,15 @@ public:
 	void											CallFrameFunc(uint32_t NFrame);
 
 private: // Methods
+	void 											PlayEffect(size_t EffectNumber);
+	void 											ForceShowNextEffect();
+	void 											TryShowNextEffect();
 
+	const std::shared_ptr<CEffect>&                 GetCurrentEffect() const;
 
 private: // Variables
-	std::vector<CEffect>							m_Effects;
-	size_t											m_CurrentEffect;
+	std::vector<std::shared_ptr<CEffect>>			m_Effects;
+	size_t											m_CurrentEffectIndex;
 	IMatrixAccess *									m_MatrixAccess;
 };
 

@@ -25,6 +25,8 @@ CCubeController::CCubeController()
 	m_Next60FramesEventCntr = 0;
 
 	m_DelayEnd = 0;
+
+	m_EffectsEngine = std::make_shared<CEffectsEngine>(this);
 }
 
 
@@ -47,14 +49,14 @@ void CCubeController::BtnYellowClick()
 {
 	HAL_GPIO_TogglePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin);
 
-	m_EffectsEngine.RepeatCurrentEffect();
+	m_EffectsEngine->RepeatCurrentEffect();
 }
 
 void CCubeController::BtnBlueClick()
 {
 	HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
 
-	m_EffectsEngine.NextEffect();
+	m_EffectsEngine->NextEffect();
 }
 
 
@@ -110,33 +112,33 @@ bool CCubeController::NextFramePresent()
 void CCubeController::ProcessFrame()
 {
 	// On 1 frame
-	m_EffectsEngine.CallFrameFunc(1);
+	m_EffectsEngine->CallFrameFunc(1);
 
 	// On 3 frames
 	if (m_Frame >= m_Next3FramesEventCntr)
 	{
-		m_EffectsEngine.CallFrameFunc(3);
+		m_EffectsEngine->CallFrameFunc(3);
 		m_Next3FramesEventCntr += 3;
 	}
 
 	// On 5 frames
 	if (m_Frame >= m_Next5FramesEventCntr)
 	{
-		m_EffectsEngine.CallFrameFunc(5);
+		m_EffectsEngine->CallFrameFunc(5);
 		m_Next5FramesEventCntr += 5;
 	}
 
 	// On 10 frames
 	if (m_Frame >= m_Next10FramesEventCntr)
 	{
-		m_EffectsEngine.CallFrameFunc(10);
+		m_EffectsEngine->CallFrameFunc(10);
 		m_Next10FramesEventCntr += 10;
 	}
 
 	// On 60 frames
 	if (m_Frame >= m_Next60FramesEventCntr)
 	{
-		m_EffectsEngine.CallFrameFunc(60);
+		m_EffectsEngine->CallFrameFunc(60);
 		m_Next60FramesEventCntr += 60;
 	}
 
