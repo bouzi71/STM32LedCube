@@ -14,7 +14,7 @@ class CEffect
 {
 public:
 	CEffect();
-	CEffect(EFrameFuncPeriod FramePeriod, uint32_t Lenght, ICubeController * CubeController);
+	CEffect(ICubeController * CubeController);
 
 	// IEffect
 	virtual void									FuncInit() override;

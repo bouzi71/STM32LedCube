@@ -4,7 +4,6 @@
 
 // Additional
 #include <EffectsLibrary.h>
-#include <string.h>
 
 
 
@@ -14,7 +13,7 @@
 CEffectsEngine::CEffectsEngine(ICubeController * CubeController)
 	: m_CubeController(CubeController)
 {
-	m_RootCollection = std::make_shared<CEffectsCollection>(m_CubeController);
+	m_RootCollection =  new CEffectsCollection(m_CubeController);
 
 	AddEffects(m_RootCollection, m_CubeController);
 

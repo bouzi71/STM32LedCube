@@ -20,8 +20,7 @@ public:
 	void											InvokeFuncFrame(EFrameFuncPeriod FramePeriod);
 
 private: // Variables
-	std::shared_ptr<CEffectsCollection>             m_RootCollection;
-
+	CEffectsCollection *                            m_RootCollection;
 	ICubeController *								m_CubeController;
 };
 

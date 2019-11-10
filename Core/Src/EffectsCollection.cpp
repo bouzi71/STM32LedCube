@@ -36,7 +36,7 @@ void CEffectsCollection::InvokeFuncFrame(EFrameFuncPeriod FramePeriod, uint32_t 
 	GetCurrentEffect()->InvokeFuncFrame(FramePeriod, m_CurrentEffectFrame);
 	m_CurrentEffectFrame += 1;
 
-	if (m_CurrentEffectFrame >= GetCurrentEffect()->GetLenght())
+	if (m_CurrentEffectFrame >= (GetCurrentEffect()->GetLenght() * GetCurrentEffect()->GetRepeatCount()))
 		PlayNextEffect();
 }
 
@@ -87,7 +87,7 @@ bool CEffectsCollection::IsNeedClearBeforeFrame() const
 
 
 // IEffectsCollection
-void CEffectsCollection::AddEffect(std::shared_ptr<IEffect> Effect)
+void CEffectsCollection::AddEffect(IEffect* Effect)
 {
 	m_Effects.push_back(Effect);
 }
@@ -97,7 +97,7 @@ size_t CEffectsCollection::GetCurrentEffectNumber() const
 	return m_CurrentEffectIndex;
 }
 
-const std::shared_ptr<IEffect>& CEffectsCollection::GetCurrentEffect() const
+IEffect* CEffectsCollection::GetCurrentEffect() const
 {
 	return m_Effects[m_CurrentEffectIndex];
 }

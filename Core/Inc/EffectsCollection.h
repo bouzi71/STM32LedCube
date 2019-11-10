@@ -32,16 +32,16 @@ public:
 	bool                                            IsNeedClearBeforeFrame() const override;
 
 	// IEffectsCollection
-	void											AddEffect(std::shared_ptr<IEffect> Effect) override;
+	void											AddEffect(IEffect* Effect) override;
 	size_t                                          GetCurrentEffectNumber() const override;
-	const std::shared_ptr<IEffect>&                 GetCurrentEffect() const override;
+	IEffect*                                        GetCurrentEffect() const override;
 	void 											PlayEffect(size_t EffectNumber) override;
 	void 											PlayNextEffect() override;
 
 private:
 	uint32_t                                        m_RepeatCnt;
 
-	std::vector<std::shared_ptr<IEffect>>			m_Effects;
+	std::vector<IEffect*>                           m_Effects;
 
 	uint32_t                                        m_CurrentEffectFrame;
 	size_t											m_CurrentEffectIndex;

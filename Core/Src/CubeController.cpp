@@ -32,7 +32,7 @@ void CCubeController::Initialize()
 	m_Next10FramesEventCntr = 0;
 	m_Next60FramesEventCntr = 0;
 
-	m_EffectsEngine = std::make_shared<CEffectsEngine>(this);
+	m_EffectsEngine = new CEffectsEngine(this);
 }
 
 void CCubeController::Update()

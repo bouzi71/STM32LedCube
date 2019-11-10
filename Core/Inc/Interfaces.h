@@ -69,9 +69,9 @@ public:
 class IEffectsCollection
 {
 public:
-	virtual void AddEffect(std::shared_ptr<IEffect> Effect) = 0;
+	virtual void AddEffect(IEffect* Effect) = 0;
 	virtual size_t GetCurrentEffectNumber() const = 0;
-	virtual const std::shared_ptr<IEffect>& GetCurrentEffect() const = 0;
+	virtual IEffect* GetCurrentEffect() const = 0;
 	virtual void PlayEffect(size_t EffectNumber) = 0;
 	virtual void PlayNextEffect() = 0;
 };

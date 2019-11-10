@@ -10,12 +10,12 @@
 CEffect::CEffect()
 {}
 
-CEffect::CEffect(EFrameFuncPeriod FramePeriod, uint32_t Lenght, ICubeController * CubeController)
-	: m_FramePeriod(FramePeriod)
+CEffect::CEffect(ICubeController * CubeController)
+	: m_FramePeriod(EFrameFuncPeriod::EFrameFuncPeriod_10)
+	, m_Lenght(1)
+    , m_RepeatCnt(1)
 	, m_CleanCubeBeforeInit(false)
 	, m_CleanCubeBeforeFrame(true)
-	, m_Lenght(Lenght)
-    , m_RepeatCnt(1)
 	, m_CubeController(CubeController)
 {}
 

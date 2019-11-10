@@ -5,6 +5,6 @@
 
 #include <Interfaces.h>
 
-void AddEffects(std::shared_ptr<IEffectsCollection> Collection, ICubeController * CubeController);
+void AddEffects(IEffectsCollection* Collection, ICubeController * CubeController);
 
 #endif

@@ -57,7 +57,7 @@ private: // Variables
 	uint32_t 										m_Next10FramesEventCntr;
 	uint32_t 										m_Next60FramesEventCntr;
 
-	std::shared_ptr<CEffectsEngine> 				m_EffectsEngine;
+	CEffectsEngine* 								m_EffectsEngine;
 };
 
 #endif
