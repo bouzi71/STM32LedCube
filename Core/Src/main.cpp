@@ -35,8 +35,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define BTN_PRESSED 1
-#define BTN_RELEASED 0
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -52,35 +50,6 @@ CCubeController controller;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
-uint8_t g_BtnYellowPressed;
-uint8_t g_BtnBluePressed;
-
-void Driver_CheckButtons()
-{
-	uint8_t btnYellowPressed = (HAL_GPIO_ReadPin(BTN_YELLOW_GPIO_Port, BTN_YELLOW_Pin) == GPIO_PIN_RESET) ? BTN_PRESSED : BTN_RELEASED;
-	uint8_t btnBluePressed   = (HAL_GPIO_ReadPin(BTN_BLUE_GPIO_Port,   BTN_BLUE_Pin  ) == GPIO_PIN_RESET) ? BTN_PRESSED : BTN_RELEASED;
-
-	if (g_BtnYellowPressed == BTN_PRESSED && btnYellowPressed == BTN_RELEASED)
-	{
-		g_BtnYellowPressed = btnYellowPressed;
-		controller.BtnYellowClick();
-		HAL_Delay(100);
-		return;
-	}
-
-	if (g_BtnBluePressed == BTN_PRESSED && btnBluePressed == BTN_RELEASED)
-	{
-		g_BtnBluePressed = btnBluePressed;
-		controller.BtnBlueClick();
-		HAL_Delay(100);
-		return;
-	}
-
-	g_BtnYellowPressed = btnYellowPressed;
-	g_BtnBluePressed = btnBluePressed;
-}
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -119,13 +88,7 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-
-  g_BtnYellowPressed = BTN_RELEASED;
-  HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_RESET);
-
-  g_BtnBluePressed = BTN_RELEASED;
-  HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_RESET);
-
+  controller.Initialize();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -133,7 +96,6 @@ int main(void)
 
   while (1)
   {
-	  Driver_CheckButtons();
 	  controller.Update();
     /* USER CODE END WHILE */
 

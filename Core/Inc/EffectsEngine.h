@@ -2,47 +2,29 @@
 #define __EFFECTSENGINE_H
 
 #include <stm32f1xx_hal.h>
-#include <memory>
 #include <vector>
 
-#include <MatrixAccess.h>
-
-//
-// Types
-//
-enum EFrameFuncType
-{
-	EFrameFuncType1 = 1,
-	EFrameFuncType3 = 3,
-	EFrameFuncType5 = 5,
-	EFrameFuncType10 = 10,
-	EFrameFuncType60 = 60
-};
-
+#include <Interfaces.h>
 
 
 //
 // CEffect
 //
 class CEffect
+		: public IEffect
 {
 public:
 	CEffect();
-	CEffect(EFrameFuncType FrameFuncType, uint32_t Lenght, IMatrixAccess * MatrixAccess);
+	CEffect(EFrameFuncPeriod FramePeriod, uint32_t Lenght, IMatrixAccess * MatrixAccess);
 
-	virtual void									FuncInit();
-	virtual void									FuncFrame(uint32_t Frame);
-
-	void                                            Reset();
-	void                                            IncCurrentFrame();
-
-	EFrameFuncType                                  GetFrameFuncType() const;
-	uint32_t                                        GetCurrentFrame() const;
-	uint32_t                                        GetLenght() const;
-
-	bool											IsPlaying() const;
-	bool                                            IsNeedClearBeforeInit() const;
-	bool                                            IsNeedClearBeforeFrame() const;
+	// IEffect
+	virtual void									FuncInit() override;
+	virtual void									FuncFrame(uint32_t Frame) override;
+	void                                            InvokeFuncFrame(EFrameFuncPeriod FramePeriod, uint32_t Frame);
+	EFrameFuncPeriod                                GetFramePeriod() const override;
+	uint32_t                                        GetLenght() const override;
+	bool                                            IsNeedClearBeforeInit() const override;
+	bool                                            IsNeedClearBeforeFrame() const override;
 
 protected:
 	void 											PlaneX(uint32_t plane);
@@ -51,16 +33,58 @@ protected:
 	void 											Cube(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd);
 	void 											CubeOutline(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd);
 
+#define SET_PIXEL(x, y, z)     (m_MatrixAccess->SetPixel(x, y, z));
+#define CLEAR_PIXEL(x, y, z)   (m_MatrixAccess->ClearPixel(x, y, z));
+#define TOGGLE_PIXEL(x, y, z)  (m_MatrixAccess->TogglePixel(x, y, z));
+#define GET_PIXEL(x, y, z)     (m_MatrixAccess->GetPixel(x, y, z))
+
 private:
-	EFrameFuncType									m_FrameFuncType;
+	EFrameFuncPeriod								m_FramePeriod;
 
 	bool											m_CleanCubeBeforeInit;
 	bool											m_CleanCubeBeforeFrame;
 
-	uint32_t										m_CurrentFrame;
 	uint32_t										m_Lenght;
 
+protected:
 	IMatrixAccess *									m_MatrixAccess;
+};
+
+
+//
+// CEffectsCollection
+//
+class CEffectsCollection
+	: public IEffect
+	, public IEffectsCollection
+{
+public:
+	CEffectsCollection(IMatrixAccess * MatrixAccess);
+
+	// IEffect
+	void											FuncInit() override;
+	void											FuncFrame(uint32_t Frame) override;
+	void                                            InvokeFuncFrame(EFrameFuncPeriod FramePeriod, uint32_t Frame);
+	EFrameFuncPeriod                          		GetFramePeriod() const override;
+	uint32_t                                        GetLenght() const override;
+	bool                                            IsNeedClearBeforeInit() const override;
+	bool                                            IsNeedClearBeforeFrame() const override;
+
+	// IEffectsCollection
+	void											AddEffect(std::shared_ptr<IEffect> Effect) override;
+	size_t                                          GetCurrentEffectNumber() const override;
+	const std::shared_ptr<IEffect>&                 GetCurrentEffect() const override;
+	void 											PlayEffect(size_t EffectNumber) override;
+	void 											PlayNextEffect() override;
+
+private:
+	std::vector<std::shared_ptr<IEffect>>			m_Effects;
+
+	uint32_t                                        m_CurrentEffectFrame;
+	size_t											m_CurrentEffectIndex;
+
+	IMatrixAccess *									m_MatrixAccess;
+
 };
 
 
@@ -75,18 +99,11 @@ public:
 
 	void											RepeatCurrentEffect();
 	void											NextEffect();
-	void											CallFrameFunc(uint32_t NFrame);
-
-private: // Methods
-	void 											PlayEffect(size_t EffectNumber);
-	void 											ForceShowNextEffect();
-	void 											TryShowNextEffect();
-
-	const std::shared_ptr<CEffect>&                 GetCurrentEffect() const;
+	void											InvokeFuncFrame(EFrameFuncPeriod FramePeriod);
 
 private: // Variables
-	std::vector<std::shared_ptr<CEffect>>			m_Effects;
-	size_t											m_CurrentEffectIndex;
+	std::shared_ptr<CEffectsCollection>             m_RootCollection;
+
 	IMatrixAccess *									m_MatrixAccess;
 };
 

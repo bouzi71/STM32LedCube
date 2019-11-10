@@ -2,20 +2,17 @@
 #define __CUBECONTROLLER_H
 
 #include <stm32f1xx_hal.h>
-#include <memory>
 
-#include <MatrixAccess.h>
+#include <Interfaces.h>
 #include <EffectsEngine.h>
+
 
 class CCubeController
 		: public IMatrixAccess
 {
 public:
-	CCubeController();
-
+	void                                            Initialize();
 	void 											Update();
-	void 											BtnYellowClick();
-	void 											BtnBlueClick();
 
 	// IMatrixAccess
 	void 											Clear() override;
@@ -25,15 +22,26 @@ public:
 	void 											TogglePixel(uint8_t x, uint8_t y, uint8_t z) override;
 	bool 											GetPixel(uint8_t x, uint8_t y, uint8_t z) const override;
 
+protected:
+	void 											BtnYellowClick();
+	void 											BtnBlueClick();
+
 private: // Methods
 	void 											WaitNextFrame();
-	bool 											NextFramePresent();
+	bool 											NextFramePresent() const;
 
+	void                                            ProcessInput();
 	void 											ProcessFrame();
 	void 											DrawMatrix();
 
 private: // Variables
 	uint8_t 										m_Matrix[8][8];
+
+	bool                                            m_BtnYellowPressed;
+	bool                                            m_BtnBluePressed;
+
+	// Delay between frames
+	uint32_t 										m_DelayEnd;
 
 	// Frame processor
 	uint32_t 										m_Frame;
@@ -41,9 +49,6 @@ private: // Variables
 	uint32_t 										m_Next5FramesEventCntr;
 	uint32_t 										m_Next10FramesEventCntr;
 	uint32_t 										m_Next60FramesEventCntr;
-
-	// Delay between frames
-	uint32_t 										m_DelayEnd;
 
 	std::shared_ptr<CEffectsEngine> 				m_EffectsEngine;
 };

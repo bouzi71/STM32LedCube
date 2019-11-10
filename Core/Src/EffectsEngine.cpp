@@ -5,139 +5,161 @@
 // Additional
 #include <string.h>
 
-/*
 
-void DrawSnakeT(uint8_t maxVal)
+//
+// SNAKE
+//
+class CEffectSnake : public CEffect
 {
-	uint8_t beginVal = 0;
-	if (maxVal > 1)
-		beginVal = maxVal - 1;
+public:
+	CEffectSnake(IMatrixAccess * MatrixAccess)
+		: CEffect(EFrameFuncPeriod_3, 65, MatrixAccess)
+	{}
 
-	for (uint8_t i = beginVal; i < maxVal; i++)
+	void FuncFrame(uint32_t Frame) override final
 	{
-		uint8_t x = i / 8;
-		uint8_t y = i % 8;
+		uint32_t t = Frame % 65;
 
+		uint8_t beginVal = 0;
+		if (t > cSnakeLenght)
+			beginVal = t - cSnakeLenght;
 
-		for (uint8_t z = 0; z < 1; z++)
+		for (uint8_t i = beginVal; i < t; i++)
 		{
-			if (x % 2 == 0)
+			uint8_t x = i / 8;
+			uint8_t y = i % 8;
+
+			for (uint8_t z = 0; z < 1; z++)
 			{
-				TOGGLE_PIXEL(x, y, z);
+				if (x % 2 == 0)
+				{
+					TOGGLE_PIXEL(x, y, z);
+				}
+				else
+				{
+					TOGGLE_PIXEL(x, 7 - y, z);
+				}
 			}
-			else
+		}
+	}
+
+private:
+	const uint32_t cSnakeLenght = 5;
+};
+
+
+
+//
+// SPIRAL
+//
+class CEffectSpiral : public CEffect
+{
+public:
+	CEffectSpiral(IMatrixAccess * MatrixAccess)
+		: CEffect(EFrameFuncPeriod_3, 79, MatrixAccess)
+	{}
+
+	void FuncInit() override final
+	{
+		napr = NAPRAVLENIE_UP;
+
+		minX = 0;
+		minY = 0;
+
+		maxX = 7;
+		maxY = 7;
+
+		posX = minX;
+		posY = minY;
+	}
+
+	void FuncFrame(uint32_t Frame) override final
+	{
+		for (uint32_t z = 0; z < 8; z++)
+			m_MatrixAccess->SetPixel(posX, posY, z);
+
+		switch (napr)
+		{
+			case NAPRAVLENIE_UP:
 			{
-				TOGGLE_PIXEL(x, 7 - y, z);
+				if (posY + 1 >= (maxY + 1) || (GET_PIXEL(posX, posY + 1, 0) == 1))
+				{
+					napr = NAPRAVLENIE_RIGHT;
+					return;
+				}
+
+				posY += 1;
 			}
+			break;
+
+			case NAPRAVLENIE_RIGHT:
+			{
+				if ((posX + 1) >= (maxX + 1) || (GET_PIXEL(posX + 1, posY, 0) == 1))
+				{
+					napr = NAPRAVLENIE_DOWN;
+					return;
+				}
+
+				posX += 1;
+			}
+			break;
+
+			case NAPRAVLENIE_DOWN:
+			{
+				if (posY == minY || (GET_PIXEL(posX, posY - 1, 0) == 1))
+				{
+					napr = NAPRAVLENIE_LEFT;
+					return;
+				}
+
+				posY -= 1;
+			}
+			break;
+
+			case NAPRAVLENIE_LEFT:
+			{
+				if (posX == minX || (GET_PIXEL(posX - 1, posY, 0) == 1))
+				{
+					napr = NAPRAVLENIE_UP;
+					return;
+				}
+
+				posX -= 1;
+			}
+			break;
 		}
 	}
-}
 
-
-
-
-void DrawSnake111(uint32_t frame)
-{
-	DrawSnakeT(frame % 65);
-}
-
-
-
-#define NAPRAVLENIE_UP 0
-#define NAPRAVLENIE_RIGHT 1
-#define NAPRAVLENIE_DOWN 2
-#define NAPRAVLENIE_LEFT 3
-
-uint8_t napr; // 0-up 1-right 2-down 3-left
-uint8_t posX;
-uint8_t posY;
-
-uint8_t minX;
-uint8_t minY;
-
-uint8_t maxX;
-uint8_t maxY;
-
-void InitSpiral()
-{
-	napr = NAPRAVLENIE_UP;
-
-	minX = 0;
-	minY = 0;
-
-	maxX = 7;
-	maxY = 7;
-
-	posX = minX;
-	posY = minY;
-}
-
-void FrameSpiral(uint32_t frame)
-{
-	for (uint32_t z = 0; z < 8; z++)
-		SET_PIXEL(posX, posY, z);
-	//SET_PIXEL(posX, posY, maxX);
-
-	//SET_PIXEL(posX, minX, posY);
-	//SET_PIXEL(posX, maxX, posY);
-
-	//SET_PIXEL(minX, posX, posY);
-	//SET_PIXEL(maxX, posX, posY);
-
-	if (napr == NAPRAVLENIE_UP)
+private:
+	enum ESpiralNapravlenie
 	{
-		if (posY + 1 >= (maxY + 1) || (GET_PIXEL(posX, posY + 1, 0) == 1))
-		{
-			napr = NAPRAVLENIE_RIGHT;
-			return;
-		}
+		NAPRAVLENIE_UP = 0,
+		NAPRAVLENIE_RIGHT,
+		NAPRAVLENIE_DOWN,
+		NAPRAVLENIE_LEFT
+	};
 
-		posY += 1;
+	ESpiralNapravlenie								napr;
+	uint8_t											posX;
+	uint8_t											posY;
 
-	}
-	else if (napr == NAPRAVLENIE_RIGHT)
-	{
-		if ((posX + 1) >= (maxX + 1) || (GET_PIXEL(posX + 1, posY, 0) == 1))
-		{
-			napr = NAPRAVLENIE_DOWN;
-			return;
-		}
+	uint8_t											minX;
+	uint8_t											minY;
 
-		posX += 1;
-	}
-	else if (napr == NAPRAVLENIE_DOWN)
-	{
-		if (posY == minY || (GET_PIXEL(posX, posY - 1, 0) == 1))
-		{
-			napr = NAPRAVLENIE_LEFT;
-			return;
-		}
-
-		posY -= 1;
-	}
-	else if (napr == NAPRAVLENIE_LEFT)
-	{
-		if (posX == minX || (GET_PIXEL(posX - 1, posY, 0) == 1))
-		{
-			napr = NAPRAVLENIE_UP;
-			return;
-		}
-
-		posX -= 1;
-	}
-}
-
-*/
+	uint8_t											maxX;
+	uint8_t											maxY;
+};
 
 
 
-// Planes -------------------------------------------------------------
-
+//
+// PLANES
+//
 class CEffectPlanes : public CEffect
 {
 public:
 	CEffectPlanes(IMatrixAccess * MatrixAccess)
-		: CEffect(EFrameFuncType5, 16, MatrixAccess)
+		: CEffect(EFrameFuncPeriod_5, 16, MatrixAccess)
 	{}
 
 	void FuncFrame(uint32_t Frame) override final
@@ -160,7 +182,7 @@ class CEffectExpandCubeToBorder : public CEffect
 {
 public:
 	CEffectExpandCubeToBorder(IMatrixAccess * MatrixAccess)
-		: CEffect(EFrameFuncType5, 4, MatrixAccess)
+		: CEffect(EFrameFuncPeriod_5, 4, MatrixAccess)
 	{}
 
 	void FuncFrame(uint32_t Frame) override final
@@ -176,7 +198,7 @@ class CEffectCollapseCubeTo777 : public CEffect
 {
 public:
 	CEffectCollapseCubeTo777(IMatrixAccess * MatrixAccess)
-		: CEffect(EFrameFuncType5, 8, MatrixAccess)
+		: CEffect(EFrameFuncPeriod_5, 8, MatrixAccess)
 	{}
 
 	void FuncFrame(uint32_t Frame) override final
@@ -192,7 +214,7 @@ class CEffectExpandCubeFrom777To000 : public CEffect
 {
 public:
 	CEffectExpandCubeFrom777To000(IMatrixAccess * MatrixAccess)
-		: CEffect(EFrameFuncType5, 8, MatrixAccess)
+		: CEffect(EFrameFuncPeriod_5, 8, MatrixAccess)
 	{}
 
 	void FuncFrame(uint32_t Frame) override final
@@ -208,7 +230,7 @@ class CEffectCollapseCubeFrom777To000 : public CEffect
 {
 public:
 	CEffectCollapseCubeFrom777To000(IMatrixAccess * MatrixAccess)
-		: CEffect(EFrameFuncType5, 8, MatrixAccess)
+		: CEffect(EFrameFuncPeriod_5, 8, MatrixAccess)
 	{}
 
 	void FuncFrame(uint32_t Frame) override final
@@ -224,7 +246,7 @@ class CEffectExpandCubeFrom000To777 : public CEffect
 {
 public:
 	CEffectExpandCubeFrom000To777(IMatrixAccess * MatrixAccess)
-		: CEffect(EFrameFuncType5, 8, MatrixAccess)
+		: CEffect(EFrameFuncPeriod_5, 8, MatrixAccess)
 	{}
 
 	void FuncFrame(uint32_t Frame) override final
@@ -240,7 +262,7 @@ class CEffectCollapseCubeFromToCenter : public CEffect
 {
 public:
 	CEffectCollapseCubeFromToCenter(IMatrixAccess * MatrixAccess)
-		: CEffect(EFrameFuncType5, 4, MatrixAccess)
+		: CEffect(EFrameFuncPeriod_5, 4, MatrixAccess)
 	{}
 
 	void FuncFrame(uint32_t Frame) override final
@@ -260,55 +282,35 @@ public:
 CEffect::CEffect()
 {}
 
-CEffect::CEffect(EFrameFuncType FrameFuncType, uint32_t Lenght, IMatrixAccess * MatrixAccess)
-	: m_FrameFuncType(FrameFuncType)
+CEffect::CEffect(EFrameFuncPeriod FramePeriod, uint32_t Lenght, IMatrixAccess * MatrixAccess)
+	: m_FramePeriod(FramePeriod)
 	, m_CleanCubeBeforeInit(false)
 	, m_CleanCubeBeforeFrame(true)
-	, m_CurrentFrame(0)
 	, m_Lenght(Lenght)
 	, m_MatrixAccess(MatrixAccess)
 {}
 
-void CEffect::FuncInit()
-{
 
-}
+// IEffect
+void CEffect::FuncInit()
+{}
 
 void CEffect::FuncFrame(uint32_t /*Frame*/)
-{
+{}
 
+void CEffect::InvokeFuncFrame(EFrameFuncPeriod /*FramePeriod*/, uint32_t Frame)
+{
+	FuncFrame(Frame);
 }
 
-void CEffect::Reset()
+EFrameFuncPeriod CEffect::GetFramePeriod() const
 {
-	m_CurrentFrame = 0;
-}
-
-
-void CEffect::IncCurrentFrame()
-{
-	m_CurrentFrame += 1;
-}
-
-EFrameFuncType CEffect::GetFrameFuncType() const
-{
-	return m_FrameFuncType;
-}
-
-
-uint32_t CEffect::GetCurrentFrame() const
-{
-	return m_CurrentFrame;
+	return m_FramePeriod;
 }
 
 uint32_t CEffect::GetLenght() const
 {
 	return m_Lenght;
-}
-
-bool CEffect::IsPlaying() const
-{
-	return m_CurrentFrame < m_Lenght;
 }
 
 bool CEffect::IsNeedClearBeforeInit() const
@@ -330,21 +332,21 @@ void CEffect::PlaneX(uint32_t plane)
 {
 	for (uint32_t y = 0; y < 8; y++)
 		for (uint32_t z = 0; z < 8; z++)
-			m_MatrixAccess->SetPixel(plane, y, z);
+			SET_PIXEL(plane, y, z);
 }
 
 void CEffect::PlaneY(uint32_t plane)
 {
 	for (uint32_t x = 0; x < 8; x++)
 		for (uint32_t z = 0; z < 8; z++)
-			m_MatrixAccess->SetPixel(x, plane, z);
+			SET_PIXEL(x, plane, z);
 }
 
 void CEffect::PlaneZ(uint32_t plane)
 {
 	for (uint32_t x = 0; x < 8; x++)
 		for (uint32_t y = 0; y < 8; y++)
-			m_MatrixAccess->SetPixel(x, y, plane);
+			SET_PIXEL(x, y, plane);
 }
 
 void CEffect::Cube(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd)
@@ -352,7 +354,7 @@ void CEffect::Cube(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEn
 	for (uint32_t x = xBegin; x <= xEnd; x++)
 		for (uint32_t y = yBegin; y <= yEnd; y++)
 			for (uint32_t z = zBegin; z <= zEnd; z++)
-				m_MatrixAccess->SetPixel(x, y, z);
+				SET_PIXEL(x, y, z);
 }
 
 void CEffect::CubeOutline(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd)
@@ -361,9 +363,105 @@ void CEffect::CubeOutline(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint3
 		for (uint32_t y = yBegin; y <= yEnd; y++)
 			for (uint32_t z = zBegin; z <= zEnd; z++)
 				if (x == xBegin || x == xEnd || y == yBegin || y == yEnd || z == zBegin || z == zEnd)
-					m_MatrixAccess->SetPixel(x, y, z);
+					SET_PIXEL(x, y, z);
 }
 
+
+
+//
+// CEffectsCollection
+//
+CEffectsCollection::CEffectsCollection(IMatrixAccess* MatrixAccess)
+    : m_CurrentEffectFrame(0)
+	, m_CurrentEffectIndex(0)
+	, m_MatrixAccess(MatrixAccess)
+{}
+
+
+// IEffect
+void CEffectsCollection::FuncInit()
+{
+	PlayEffect(0);
+}
+
+void CEffectsCollection::FuncFrame(uint32_t Frame)
+{
+
+}
+
+void CEffectsCollection::InvokeFuncFrame(EFrameFuncPeriod FramePeriod, uint32_t /*Frame*/)
+{
+	if (FramePeriod != (GetCurrentEffect()->GetFramePeriod()))
+		return;
+
+	if (GetCurrentEffect()->IsNeedClearBeforeFrame())
+		m_MatrixAccess->Clear();
+
+	GetCurrentEffect()->InvokeFuncFrame(FramePeriod, m_CurrentEffectFrame);
+	m_CurrentEffectFrame += 1;
+
+	if (m_CurrentEffectFrame >= GetCurrentEffect()->GetLenght())
+		PlayNextEffect();
+}
+
+EFrameFuncPeriod CEffectsCollection::GetFramePeriod() const
+{
+	return GetCurrentEffect()->GetFramePeriod();
+}
+
+uint32_t CEffectsCollection::GetLenght() const
+{
+	uint32_t lenght = 0;
+	for (const auto& e : m_Effects)
+		lenght += e->GetLenght();
+	return lenght;
+}
+
+bool CEffectsCollection::IsNeedClearBeforeInit() const
+{
+	return GetCurrentEffect()->IsNeedClearBeforeInit();
+}
+
+bool CEffectsCollection::IsNeedClearBeforeFrame() const
+{
+	return GetCurrentEffect()->IsNeedClearBeforeFrame();
+}
+
+
+// IEffectsCollection
+void CEffectsCollection::AddEffect(std::shared_ptr<IEffect> Effect)
+{
+	m_Effects.push_back(Effect);
+}
+
+size_t CEffectsCollection::GetCurrentEffectNumber() const
+{
+	return m_CurrentEffectIndex;
+}
+
+const std::shared_ptr<IEffect>& CEffectsCollection::GetCurrentEffect() const
+{
+	return m_Effects[m_CurrentEffectIndex];
+}
+
+void CEffectsCollection::PlayEffect(size_t EffectNumber)
+{
+	if (EffectNumber >= m_Effects.size())
+		EffectNumber = 0;
+
+	m_CurrentEffectFrame = 0;
+	m_CurrentEffectIndex = EffectNumber;
+
+	if (GetCurrentEffect()->IsNeedClearBeforeInit())
+		m_MatrixAccess->Clear();
+
+	GetCurrentEffect()->FuncInit();
+}
+
+void CEffectsCollection::PlayNextEffect()
+{
+	PlayEffect(m_CurrentEffectIndex + 1);
+}
 
 
 //
@@ -372,82 +470,36 @@ void CEffect::CubeOutline(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint3
 CEffectsEngine::CEffectsEngine(IMatrixAccess * MatrixAccess)
 	: m_MatrixAccess(MatrixAccess)
 {
-	m_Effects.push_back(std::make_shared<CEffectExpandCubeToBorder>(m_MatrixAccess));
-	m_Effects.push_back(std::make_shared<CEffectCollapseCubeTo777>(m_MatrixAccess));
-	m_Effects.push_back(std::make_shared<CEffectExpandCubeFrom777To000>(m_MatrixAccess));
-	m_Effects.push_back(std::make_shared<CEffectCollapseCubeFrom777To000>(m_MatrixAccess));
-	m_Effects.push_back(std::make_shared<CEffectExpandCubeFrom000To777>(m_MatrixAccess));
-	m_Effects.push_back(std::make_shared<CEffectCollapseCubeFromToCenter>(m_MatrixAccess));
-	m_Effects.push_back(std::make_shared<CEffectPlanes>(m_MatrixAccess));
+	m_RootCollection = std::make_shared<CEffectsCollection>(m_MatrixAccess);
 
-	PlayEffect(0);
+	std::shared_ptr<CEffectsCollection> cubeEffectCollection = std::make_shared<CEffectsCollection>(m_MatrixAccess);
+	cubeEffectCollection->AddEffect(std::make_shared<CEffectExpandCubeToBorder>(m_MatrixAccess));
+	cubeEffectCollection->AddEffect(std::make_shared<CEffectCollapseCubeTo777>(m_MatrixAccess));
+	cubeEffectCollection->AddEffect(std::make_shared<CEffectExpandCubeFrom777To000>(m_MatrixAccess));
+	cubeEffectCollection->AddEffect(std::make_shared<CEffectCollapseCubeFrom777To000>(m_MatrixAccess));
+	cubeEffectCollection->AddEffect(std::make_shared<CEffectExpandCubeFrom000To777>(m_MatrixAccess));
+	cubeEffectCollection->AddEffect(std::make_shared<CEffectCollapseCubeFromToCenter>(m_MatrixAccess));
+	m_RootCollection->AddEffect(cubeEffectCollection);
+
+	m_RootCollection->AddEffect(std::make_shared<CEffectPlanes>(m_MatrixAccess));
+	m_RootCollection->AddEffect(std::make_shared<CEffectSpiral>(m_MatrixAccess));
+	m_RootCollection->AddEffect(std::make_shared<CEffectSnake>(m_MatrixAccess));
+
+	m_RootCollection->FuncInit();
 }
 
 // Public
 void CEffectsEngine::RepeatCurrentEffect()
 {
-	PlayEffect(m_CurrentEffectIndex);
+	m_RootCollection->PlayEffect(m_RootCollection->GetCurrentEffectNumber());
 }
 
 void CEffectsEngine::NextEffect()
 {
-	ForceShowNextEffect();
+	m_RootCollection->PlayNextEffect();
 }
 
-void CEffectsEngine::CallFrameFunc(uint32_t NFrame)
+void CEffectsEngine::InvokeFuncFrame(EFrameFuncPeriod FramePeriod)
 {
-	if (NFrame != (uint32_t)(GetCurrentEffect()->GetFrameFuncType()))
-		return;
-
-	if (GetCurrentEffect()->IsNeedClearBeforeFrame())
-		m_MatrixAccess->Clear();
-
-	GetCurrentEffect()->FuncFrame(GetCurrentEffect()->GetCurrentFrame());
-	GetCurrentEffect()->IncCurrentFrame();
-
-	TryShowNextEffect();
+	m_RootCollection->InvokeFuncFrame(FramePeriod, UINT32_MAX);
 }
-
-// Private
-void CEffectsEngine::PlayEffect(size_t EffectNumber)
-{
-	if (EffectNumber >= m_Effects.size())
-		return;
-
-	m_CurrentEffectIndex = EffectNumber;
-	GetCurrentEffect()->Reset();
-
-	if (GetCurrentEffect()->IsNeedClearBeforeInit())
-		m_MatrixAccess->Clear();
-
-	GetCurrentEffect()->FuncInit();
-}
-
-/*
- * Break current effect and show next
- */
-void CEffectsEngine::ForceShowNextEffect()
-{
-	size_t nextEffectNumber = m_CurrentEffectIndex + 1;
-	if (nextEffectNumber >= m_Effects.size())
-		nextEffectNumber = 0;
-
-	PlayEffect(nextEffectNumber);
-}
-
-/*
- * If current effect ended, then show next effect
- */
-void CEffectsEngine::TryShowNextEffect()
-{
-	if (GetCurrentEffect()->IsPlaying())
-		return;
-
-	ForceShowNextEffect();
-}
-
-const std::shared_ptr<CEffect>& CEffectsEngine::GetCurrentEffect() const
-{
-	return m_Effects[m_CurrentEffectIndex];
-}
-

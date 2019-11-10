@@ -14,9 +14,17 @@
 //
 // CCubeController
 //
-CCubeController::CCubeController()
+void CCubeController::Initialize()
 {
 	Clear();
+
+	m_BtnYellowPressed = false;
+	HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_RESET);
+
+	m_BtnBluePressed = false;
+	HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_RESET);
+
+	m_DelayEnd = 0;
 
 	m_Frame = 0;
 	m_Next3FramesEventCntr = 0;
@@ -24,18 +32,13 @@ CCubeController::CCubeController()
 	m_Next10FramesEventCntr = 0;
 	m_Next60FramesEventCntr = 0;
 
-	m_DelayEnd = 0;
-
 	m_EffectsEngine = std::make_shared<CEffectsEngine>(this);
 }
 
-
-
-//
-// Public
-//
 void CCubeController::Update()
 {
+	ProcessInput();
+
 	if (NextFramePresent())
 	{
 		ProcessFrame();
@@ -44,21 +47,6 @@ void CCubeController::Update()
 
 	DrawMatrix();
 }
-
-void CCubeController::BtnYellowClick()
-{
-	HAL_GPIO_TogglePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin);
-
-	m_EffectsEngine->RepeatCurrentEffect();
-}
-
-void CCubeController::BtnBlueClick()
-{
-	HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
-
-	m_EffectsEngine->NextEffect();
-}
-
 
 
 //
@@ -95,6 +83,23 @@ bool CCubeController::GetPixel(uint8_t x, uint8_t y, uint8_t z) const
 }
 
 
+//
+// Protected
+//
+void CCubeController::BtnYellowClick()
+{
+	//HAL_GPIO_TogglePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin);
+
+	m_EffectsEngine->RepeatCurrentEffect();
+}
+
+void CCubeController::BtnBlueClick()
+{
+	//HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
+
+	m_EffectsEngine->NextEffect();
+}
+
 
 //
 // Private
@@ -104,46 +109,80 @@ void CCubeController::WaitNextFrame()
 	m_DelayEnd = HAL_GetTick() + ONE_FRAME_TIME;
 }
 
-bool CCubeController::NextFramePresent()
+bool CCubeController::NextFramePresent() const
 {
 	return m_DelayEnd < HAL_GetTick();
+}
+
+void CCubeController::ProcessInput()
+{
+	bool btnYellowPressed = (HAL_GPIO_ReadPin(BTN_YELLOW_GPIO_Port, BTN_YELLOW_Pin) == GPIO_PIN_RESET);
+	bool btnBluePressed   = (HAL_GPIO_ReadPin(BTN_BLUE_GPIO_Port,   BTN_BLUE_Pin  ) == GPIO_PIN_RESET);
+
+	if (m_BtnYellowPressed && !btnYellowPressed)
+	{
+		m_BtnYellowPressed = btnYellowPressed;
+
+		HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_SET);
+		BtnYellowClick();
+		HAL_Delay(100);
+		HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_RESET);
+
+		return;
+	}
+
+	if (m_BtnBluePressed && !btnBluePressed)
+	{
+		m_BtnBluePressed = btnBluePressed;
+
+		HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_SET);
+		BtnBlueClick();
+		HAL_Delay(100);
+		HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_RESET);
+
+		return;
+	}
+
+	m_BtnYellowPressed = btnYellowPressed;
+	m_BtnBluePressed = btnBluePressed;
 }
 
 void CCubeController::ProcessFrame()
 {
 	// On 1 frame
-	m_EffectsEngine->CallFrameFunc(1);
+	m_EffectsEngine->InvokeFuncFrame(EFrameFuncPeriod::EFrameFuncPeriod_1);
 
 	// On 3 frames
 	if (m_Frame >= m_Next3FramesEventCntr)
 	{
-		m_EffectsEngine->CallFrameFunc(3);
+		m_EffectsEngine->InvokeFuncFrame(EFrameFuncPeriod::EFrameFuncPeriod_3);
 		m_Next3FramesEventCntr += 3;
 	}
 
 	// On 5 frames
 	if (m_Frame >= m_Next5FramesEventCntr)
 	{
-		m_EffectsEngine->CallFrameFunc(5);
+		m_EffectsEngine->InvokeFuncFrame(EFrameFuncPeriod::EFrameFuncPeriod_5);
 		m_Next5FramesEventCntr += 5;
 	}
 
 	// On 10 frames
 	if (m_Frame >= m_Next10FramesEventCntr)
 	{
-		m_EffectsEngine->CallFrameFunc(10);
+		m_EffectsEngine->InvokeFuncFrame(EFrameFuncPeriod::EFrameFuncPeriod_10);
 		m_Next10FramesEventCntr += 10;
 	}
 
 	// On 60 frames
 	if (m_Frame >= m_Next60FramesEventCntr)
 	{
-		m_EffectsEngine->CallFrameFunc(60);
+		m_EffectsEngine->InvokeFuncFrame(EFrameFuncPeriod::EFrameFuncPeriod_60);
 		m_Next60FramesEventCntr += 60;
 	}
 
 	m_Frame++;
 }
+
 
 void CCubeController::DrawMatrix()
 {
