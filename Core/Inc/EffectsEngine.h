@@ -6,10 +6,6 @@
 #include <Interfaces.h>
 #include <EffectsCollection.h>
 
-
-//
-// CEffectsEngine
-//
 class CEffectsEngine
 {
 public:
@@ -19,7 +15,7 @@ public:
 	void											NextEffect();
 	void											InvokeFuncFrame(EFrameFuncPeriod FramePeriod);
 
-private: // Variables
+private:
 	CEffectsCollection *                            m_RootCollection;
 	ICubeController *								m_CubeController;
 };

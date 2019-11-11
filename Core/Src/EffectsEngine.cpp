@@ -20,7 +20,6 @@ CEffectsEngine::CEffectsEngine(ICubeController * CubeController)
 	m_RootCollection->FuncInit();
 }
 
-// Public
 void CEffectsEngine::RepeatCurrentEffect()
 {
 	m_RootCollection->PlayEffect(m_RootCollection->GetCurrentEffectNumber());

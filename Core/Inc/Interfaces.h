@@ -16,6 +16,9 @@ public:
 	virtual void ClearPixel(uint8_t x, uint8_t y, uint8_t z) = 0;
 	virtual void TogglePixel(uint8_t x, uint8_t y, uint8_t z) = 0;
 	virtual bool GetPixel(uint8_t x, uint8_t y, uint8_t z) const = 0;
+
+	virtual void Apply(uint8_t ** PtrToData) = 0;
+	virtual uint8_t ** GetPtr() const = 0;
 };
 
 class ICubeController

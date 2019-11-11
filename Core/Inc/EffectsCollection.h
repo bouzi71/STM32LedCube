@@ -6,10 +6,6 @@
 
 #include <Interfaces.h>
 
-
-//
-// CEffectsCollection
-//
 class CEffectsCollection
 	: public IEffect
 	, public IEffectsCollection
@@ -41,7 +37,7 @@ public:
 private:
 	uint32_t                                        m_RepeatCnt;
 
-	std::vector<IEffect*>                           m_Effects;
+	std::vector<IEffect*>                            m_Effects;
 
 	uint32_t                                        m_CurrentEffectFrame;
 	size_t											m_CurrentEffectIndex;

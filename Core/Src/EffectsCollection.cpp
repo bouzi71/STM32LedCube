@@ -11,7 +11,8 @@ CEffectsCollection::CEffectsCollection(ICubeController * CubeController)
 	, m_CurrentEffectFrame(0)
 	, m_CurrentEffectIndex(0)
 	, m_CubeController(CubeController)
-{}
+{
+}
 
 
 // IEffect

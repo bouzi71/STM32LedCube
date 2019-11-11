@@ -5,12 +5,8 @@
 
 #include <Interfaces.h>
 
-
-//
-// CEffect
-//
 class CEffect
-		: public IEffect
+	: public IEffect
 {
 public:
 	CEffect();

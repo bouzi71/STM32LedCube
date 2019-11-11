@@ -16,7 +16,7 @@
 //
 void CCubeController::Initialize()
 {
-	Clear();
+	m_LedMatrix.Clear();
 
 	m_BtnYellowPressed = false;
 	HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_RESET);
@@ -89,42 +89,11 @@ void CCubeController::GoToErrorState()
 
 IMatrixAccess* CCubeController::GetMatrix()
 {
-	return this;
+	return &m_LedMatrix;
 }
 
 
-//
-// IMatrixAccess
-//
-void CCubeController::Clear()
-{
-	memset(&m_Matrix[0][0], 0x00, sizeof(m_Matrix));
-}
 
-void CCubeController::Fill()
-{
-	memset(&m_Matrix[0][0], 0xFF, sizeof(m_Matrix));
-}
-
-void CCubeController::SetPixel(uint8_t x, uint8_t y, uint8_t z)
-{
-	m_Matrix[y][z] |=  (0x01 << x);
-}
-
-void CCubeController::ClearPixel(uint8_t x, uint8_t y, uint8_t z)
-{
-	m_Matrix[y][z] &= ~(0x01 << x);
-}
-
-void CCubeController::TogglePixel(uint8_t x, uint8_t y, uint8_t z)
-{
-	m_Matrix[y][z] ^=  (0x01 << x);
-}
-
-bool CCubeController::GetPixel(uint8_t x, uint8_t y, uint8_t z) const
-{
-	return (m_Matrix[y][z] & (0x01 << x)) == (0x01 << x);
-}
 
 
 //
@@ -245,7 +214,7 @@ void CCubeController::DrawMatrix()
 		HAL_SPI_Transmit(&hspi1, &data, 1, 1);
 
 		for (uint32_t j = 0; j < 8; j++)
-			HAL_SPI_Transmit(&hspi1, &m_Matrix[i][j], 1, 1);
+			HAL_SPI_Transmit(&hspi1, &(m_LedMatrix.GetPtr()[i][j]), 1, 1);
 
 		HAL_GPIO_WritePin(CUBE_CS_GPIO_Port, CUBE_CS_Pin, GPIO_PIN_SET);
 	}

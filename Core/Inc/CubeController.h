@@ -4,12 +4,12 @@
 #include <stm32f1xx_hal.h>
 
 #include <Interfaces.h>
+#include <LedMatrix.h>
 #include <EffectsEngine.h>
 
 
 class CCubeController
-		: public ICubeController
-		, public IMatrixAccess
+	: public ICubeController
 {
 public:
 	void                                            Initialize();
@@ -20,14 +20,6 @@ public:
 	void                                            BlinkBlueLed() override;
 	void                                            GoToErrorState() override;
 	IMatrixAccess *                                 GetMatrix() override;
-
-	// IMatrixAccess
-	void 											Clear() override;
-	void 											Fill() override;
-	void 											SetPixel(uint8_t x, uint8_t y, uint8_t z) override;
-	void 											ClearPixel(uint8_t x, uint8_t y, uint8_t z) override;
-	void 											TogglePixel(uint8_t x, uint8_t y, uint8_t z) override;
-	bool 											GetPixel(uint8_t x, uint8_t y, uint8_t z) const override;
 
 protected:
 	void 											BtnYellowClick();
@@ -42,7 +34,7 @@ private: // Methods
 	void 											DrawMatrix();
 
 private: // Variables
-	uint8_t 										m_Matrix[8][8];
+	CLedMatrix                                      m_LedMatrix;
 
 	bool                                            m_BtnYellowPressed;
 	bool                                            m_BtnBluePressed;

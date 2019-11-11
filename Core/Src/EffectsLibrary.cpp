@@ -6,6 +6,41 @@
 #include <Effect.h>
 #include <EffectsCollection.h>
 
+
+class CTestEffect : public CEffect
+{
+public:
+	CTestEffect(ICubeController * CubeController)
+		: CEffect(CubeController)
+	{
+		SetFramePeriod(EFrameFuncPeriod_10);
+		SetLenght(100);
+
+		//m_Translate = glm::vec3(0.0f, 0.0f, 0.0f);
+		//m_Rotate = glm::vec3(0.0f, 0.0f, 0.0f);
+		//m_Scale = glm::vec3(1.0f, 1.0f, 1.0f);
+	}
+
+	void FuncFrame(uint32_t Frame) override final
+	{
+	    //m_LocalTransform = glm::mat4(1.0f);
+
+	    //m_LocalTransform = glm::translate(m_LocalTransform, m_Translate);
+	    //m_LocalTransform = glm::rotate(m_LocalTransform, m_Rotate.x, glm::vec3(1, 0, 0));
+	    //m_LocalTransform = glm::rotate(m_LocalTransform, m_Rotate.y, glm::vec3(0, 1, 0));
+	    //m_LocalTransform = glm::rotate(m_LocalTransform, m_Rotate.z, glm::vec3(0, 0, 1));
+	    //m_LocalTransform = glm::scale(m_LocalTransform, m_Scale);
+	}
+
+private:
+	//glm::mat4 m_LocalTransform;
+
+	//glm::vec3 m_Translate;
+	//glm::vec3 m_Rotate;
+	//glm::vec3 m_Scale;
+};
+
+
 //
 // SNAKE
 //
@@ -177,6 +212,10 @@ public:
 	void FuncFrame(uint32_t Frame) override final
 	{
 		uint32_t t = Frame % 16;
+
+		if (t == 15)
+			return;
+
 		if (t >= 8)
 			t = 14 - t;
 
@@ -306,6 +345,9 @@ public:
 
 void AddEffects(IEffectsCollection* Collection, ICubeController * CubeController)
 {
+	Collection->AddEffect(new CTestEffect(CubeController));
+
+
 	CEffectsCollection* cubeEffectCollection = new CEffectsCollection(CubeController);
 	cubeEffectCollection->AddEffect(new CEffectExpandCubeToBorder(CubeController));
 	cubeEffectCollection->AddEffect(new CEffectCollapseCubeTo777(CubeController));
