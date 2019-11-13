@@ -5,7 +5,7 @@
 // Additional
 #include <string.h>
 #include <main.h>
-#include <spi.h>
+#include <stm32f407xx.h>
 
 // Defines
 #define ONE_FRAME_TIME (1000 / 60)
@@ -19,10 +19,10 @@ void CCubeController::Initialize()
 	m_LedMatrix.Clear();
 
 	m_BtnYellowPressed = false;
-	HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_RESET);
+	//HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_RESET);
 
 	m_BtnBluePressed = false;
-	HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_RESET);
+	//HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_RESET);
 
 	m_DelayEnd = 0;
 
@@ -55,28 +55,28 @@ void CCubeController::Update()
 //
 void CCubeController::BlinkYellowLed()
 {
-	if (HAL_GPIO_ReadPin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin) == GPIO_PIN_SET)
+	/*if (HAL_GPIO_ReadPin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin) == GPIO_PIN_SET)
 		return;
 
 	HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_SET);
 	HAL_Delay(1);
-	HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_RESET);*/
 }
 
 void CCubeController::BlinkBlueLed()
 {
-	if (HAL_GPIO_ReadPin(LED_BLUE_GPIO_Port, LED_BLUE_Pin) == GPIO_PIN_SET)
+	/*if (HAL_GPIO_ReadPin(LED_BLUE_GPIO_Port, LED_BLUE_Pin) == GPIO_PIN_SET)
 		return;
 
 	HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_SET);
 	HAL_Delay(1);
-	HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_RESET);*/
 }
 
 
 void CCubeController::GoToErrorState()
 {
-	while(true)
+	/*while(true)
 	{
 		HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_SET);
 		HAL_Delay(200);
@@ -84,7 +84,7 @@ void CCubeController::GoToErrorState()
 		HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_SET);
 		HAL_Delay(200);
 		HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_RESET);
-	}
+	}*/
 }
 
 IMatrixAccess* CCubeController::GetMatrix()
@@ -129,7 +129,7 @@ bool CCubeController::NextFramePresent() const
 
 void CCubeController::ProcessInput()
 {
-	bool btnYellowPressed = (HAL_GPIO_ReadPin(BTN_YELLOW_GPIO_Port, BTN_YELLOW_Pin) == GPIO_PIN_RESET);
+	/*bool btnYellowPressed = (HAL_GPIO_ReadPin(BTN_YELLOW_GPIO_Port, BTN_YELLOW_Pin) == GPIO_PIN_RESET);
 	bool btnBluePressed   = (HAL_GPIO_ReadPin(BTN_BLUE_GPIO_Port,   BTN_BLUE_Pin  ) == GPIO_PIN_RESET);
 
 	if (m_BtnYellowPressed != btnYellowPressed)
@@ -165,7 +165,7 @@ void CCubeController::ProcessInput()
 	}
 
 	m_BtnYellowPressed = btnYellowPressed;
-	m_BtnBluePressed = btnBluePressed;
+	m_BtnBluePressed = btnBluePressed;*/
 }
 
 void CCubeController::ProcessFrame()
@@ -203,6 +203,8 @@ void CCubeController::ProcessFrame()
 
 	m_Frame++;
 }
+
+extern SPI_HandleTypeDef hspi1;
 
 void CCubeController::DrawMatrix()
 {

@@ -1,8 +1,6 @@
 #ifndef __CUBECONTROLLER_H
 #define __CUBECONTROLLER_H
 
-#include <stm32f1xx_hal.h>
-
 #include <Interfaces.h>
 #include <LedMatrix.h>
 #include <EffectsEngine.h>

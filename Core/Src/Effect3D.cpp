@@ -7,104 +7,135 @@
 
 #define SLOW_ROUND(x) ::round(x)
 #define FAST_ROUND(x) (uint8_t)(x + 0.5f)
-#define DEFAUL_ROUND(x) SLOW_ROUND(x)
+#define DEFAUL_ROUND(x) FAST_ROUND(x)
 
 CEffect3D::CEffect3D(ICubeController * CubeController)
 	: CEffect(CubeController)
+	, m_DrawMode(EDrawMode::EDrawMode_Set)
+    , m_Effect3DIsNeedCleadBeforeFrame(true)
 {
-	SetClearBeforeFrame(false); // DO NOT CHANGE!!!
+	SetClearBeforeInit(false);
 }
 
 void CEffect3D::FuncFrame(uint32_t Frame)
 {
-	if (!FuncFrame3D(Frame))
+	if (!FuncFrame3D(Frame, float(Frame) / float(GetLenght())))
 		return;
 
 	// Do redraw fugure
-	m_CubeController->GetMatrix()->Clear();
-	for (const auto& p : m_Fugure)
-	{
-		Vector3 pResult = p;
-		pResult *= m_WorldMatrix;
+	if (m_Effect3DIsNeedCleadBeforeFrame)
+		m_CubeController->GetMatrix()->Clear();
 
-		ApplyPointToMatrix(pResult);
+	for (size_t i = 0; i < m_Fugure.GetPointCount(); i++)
+	{
+		ApplyPointToMatrix(m_Fugure.GetConvertedPoint(m_WorldMatrix, i));
 	}
+}
+
+
+bool CEffect3D::IsNeedClearBeforeInit() const
+{
+	return CEffect::IsNeedClearBeforeInit();
+}
+
+bool CEffect3D::IsNeedClearBeforeFrame() const
+{
+	return false;
+}
+
+
+//
+// Public
+//
+float CEffect3D::GetLenghtFloat() const
+{
+	return float(GetLenght());
 }
 
 
 //
 // Protected
 //
-
-void CEffect3D::ClearFigure()
-{
-	m_Fugure.clear();
-}
-
-Vector3 CEffect3D::ToVector3(uint8_t x, uint8_t y, uint8_t z) const
-{
-	Vector3 p = Vector3(x, y, z); // TODO: Optimize me
-	p /= cMultiplyValue;
-	p -= cOffsetVector;
-	return p;
-}
-
-bool CEffect3D::FuncFrame3D(uint32_t Frame)
+bool CEffect3D::FuncFrame3D(uint32_t FrameUint, float FrameFloat)
 {
 	return true;
+}
+
+
+void CEffect3D::SetClearBeforeInit(bool Value)
+{
+	CEffect::SetClearBeforeInit(Value);
+}
+
+void CEffect3D::SetClearBeforeFrame(bool Value)
+{
+	m_Effect3DIsNeedCleadBeforeFrame = Value;
+}
+
+
+void CEffect3D::SetDrawMode(EDrawMode DrawMode)
+{
+	m_DrawMode = DrawMode;
 }
 
 //
 // Virtual protected
 //
+void CEffect3D::LineX(uint32_t planeY, uint32_t planeZ)
+{
+	for (uint32_t x = 0; x < 8; x++)
+		m_Fugure.AddPoint(x, planeY, planeZ);
+}
+
+void CEffect3D::LineY(uint32_t planeX, uint32_t planeZ)
+{
+	for (uint32_t y = 0; y < 8; y++)
+		m_Fugure.AddPoint(planeX, y, planeZ);
+}
+
+void CEffect3D::LineZ(uint32_t planeX, uint32_t planeY)
+{
+	for (uint32_t z = 0; z < 8; z++)
+		m_Fugure.AddPoint(planeX, planeY, z);
+}
+
 void CEffect3D::PlaneX(uint32_t plane)
 {
-	ClearFigure();
-
 	for (uint32_t y = 0; y < 8; y++)
 		for (uint32_t z = 0; z < 8; z++)
-			m_Fugure.push_back(ToVector3(plane, y, z));
+			m_Fugure.AddPoint(plane, y, z);
 }
 
 void CEffect3D::PlaneY(uint32_t plane)
 {
-	ClearFigure();
-
 	for (uint32_t x = 0; x < 8; x++)
 		for (uint32_t z = 0; z < 8; z++)
-			m_Fugure.push_back(ToVector3(x, plane, z));
+			m_Fugure.AddPoint(x, plane, z);
 }
 
 void CEffect3D::PlaneZ(uint32_t plane)
 {
-	ClearFigure();
-
 	for (uint32_t x = 0; x < 8; x++)
 		for (uint32_t y = 0; y < 8; y++)
-			m_Fugure.push_back(ToVector3(x, y, plane));
+			m_Fugure.AddPoint(x, y, plane);
 }
 
 void CEffect3D::Cube(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd)
 {
-	ClearFigure();
-
 	for (uint32_t x = xBegin; x <= xEnd; x++)
 		for (uint32_t y = yBegin; y <= yEnd; y++)
 			for (uint32_t z = zBegin; z <= zEnd; z++)
-				m_Fugure.push_back(ToVector3(x, y, z));
+				m_Fugure.AddPoint(x, y, z);
 }
 
 void CEffect3D::CubeOutline(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd)
 {
-	ClearFigure();
-
 	for (uint32_t x = xBegin; x <= xEnd; x++)
 		for (uint32_t y = yBegin; y <= yEnd; y++)
 			for (uint32_t z = zBegin; z <= zEnd; z++)
 				if (x == xBegin || x == xEnd || y == yBegin || y == yEnd || z == zBegin || z == zEnd)
-					m_Fugure.push_back(ToVector3(x, y, z));
+					m_Fugure.AddPoint(x, y, z);
 }
-
 
 
 //
@@ -112,8 +143,18 @@ void CEffect3D::CubeOutline(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uin
 //
 void CEffect3D::ApplyPointToMatrix(const Vector3& Vector)
 {
-	Vector3 p = Vector;
-	p += cOffsetVector;
-	p *= 7.0f;
-	SET_PIXEL(DEFAUL_ROUND(p.x), DEFAUL_ROUND(p.y), DEFAUL_ROUND(p.z))
+	switch (m_DrawMode)
+	{
+		case EDrawMode_Set:
+			SET_PIXEL(DEFAUL_ROUND(Vector.x), DEFAUL_ROUND(Vector.y), DEFAUL_ROUND(Vector.z))
+		break;
+
+		case EDrawMode_Clear:
+			CLEAR_PIXEL(DEFAUL_ROUND(Vector.x), DEFAUL_ROUND(Vector.y), DEFAUL_ROUND(Vector.z))
+		break;
+
+		case EDrawMode_Toggle:
+			TOGGLE_PIXEL(DEFAUL_ROUND(Vector.x), DEFAUL_ROUND(Vector.y), DEFAUL_ROUND(Vector.z))
+		break;
+	}
 }

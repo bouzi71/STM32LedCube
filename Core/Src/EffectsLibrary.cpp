@@ -5,6 +5,7 @@
 // Additional
 #include <Effect.h>
 #include <Effect3D.h>
+#include <EffectFullScreen.h>
 #include <EffectsCollection.h>
 
 #include "Math/matrix4x4.h"
@@ -16,29 +17,87 @@ public:
 	CTestEffect(ICubeController * CubeController)
 		: CEffect3D(CubeController)
 	{
-		SetFramePeriod(EFrameFuncPeriod_3);
-		SetLenght(25);
+		SetFramePeriod(EFrameFuncPeriod_1);
+		SetLenght(50);
 
-		PlaneY(4);
+		SetClearBeforeInit(true);
+		SetClearBeforeFrame(false);
+
+		//PlaneY(0);
+		//CubeOutline(1, 6, 1, 6, 1, 6);
+
+		LineX(4, 0);
+		//LineX(3, 0);
 	}
 
-	bool FuncFrame3D(uint32_t Frame) override final
+	bool FuncFrame3D(uint32_t FrameUint, float FrameFloat) override final
 	{
-		const float rotYValue = (3.14f / 25.0f) * float(Frame);
+		const float RotValue = ((3.14f / 2.0f) / GetLenghtFloat()) * float(FrameUint);
 
-		//Matrix4 trMat;
-		//Matrix4::Translation(Vector3(0.0f, 0.0f, 0.0f), trMat);
+		Matrix4 trMat;
+		Matrix4::Translation(Vector3(0.0f, 0.0f, FrameFloat), trMat);
 
-		Matrix4 rotMatX;
-		Matrix4::RotationX(rotYValue, rotMatX);
+		Matrix4 rotMatZ;
+		Matrix4::RotationZ(RotValue, rotMatZ);
 
-		//Matrix4 rotMatZ;
-		//Matrix4::RotationZ(rotYValue, rotMatZ);
+		m_WorldMatrix = trMat * rotMatZ;
 
-		//Matrix4 scaleMat;
-		//Matrix4::Scaling(Vector3(0.7f, 1.0f, 0.7f), scaleMat);
+		return true;
+	}
+};
 
-		m_WorldMatrix = rotMatX;
+class CTestClearEffect : public CTestEffect
+{
+public:
+	CTestClearEffect(ICubeController * CubeController)
+		: CTestEffect(CubeController)
+	{
+		SetClearBeforeInit(false);
+		SetDrawMode(EDrawMode_Clear);
+	}
+};
+
+
+class CFullMatrixEffect3D : public CEffect3D
+{
+public:
+	CFullMatrixEffect3D(ICubeController * CubeController)
+		: CEffect3D(CubeController)
+	{
+		SetFramePeriod(EFrameFuncPeriod_3);
+		SetLenght(50);
+
+		SetClearBeforeInit(false);
+		SetClearBeforeFrame(true);
+
+
+
+		//PlaneY(0);
+		//CubeOutline(1, 6, 1, 6, 1, 6);
+
+		//LineX(4, 0);
+		//LineX(3, 0);
+	}
+
+	void FuncInit() override
+	{
+		m_Fugure.Clear();
+
+		for (uint8_t x = 0; x < 8; x++)
+			for (uint8_t y = 0; y < 8; y++)
+				for (uint8_t z = 0; z < 8; z++)
+					if (m_CubeController->GetMatrix()->GetPixel(x, y,z))
+						m_Fugure.AddPoint(x, y, z);
+	}
+
+	bool FuncFrame3D(uint32_t FrameUint, float FrameFloat) override final
+	{
+		const float RotValue = ((M_PI * 2.0f) / GetLenghtFloat()) * float(FrameUint);
+
+		Matrix4 rotMatY;
+		Matrix4::RotationY(RotValue, rotMatY);
+
+		m_WorldMatrix = rotMatY;
 
 		return true;
 	}
@@ -71,7 +130,7 @@ public:
 			uint8_t x = i / 8;
 			uint8_t y = i % 8;
 
-			for (uint8_t z = 0; z < 7; z++)
+			for (uint8_t z = 0; z < 8; z++)
 			{
 				if (x % 2 == 0)
 				{
@@ -210,15 +269,12 @@ public:
 		: CEffect(CubeController)
 	{
 		SetFramePeriod(EFrameFuncPeriod_5);
-		SetLenght(16);
+		SetLenght(12);
 	}
 
 	void FuncFrame(uint32_t Frame) override final
 	{
 		uint32_t t = Frame % 16;
-
-		if (t == 15)
-			return;
 
 		if (t >= 8)
 			t = 14 - t;
@@ -350,9 +406,13 @@ public:
 void AddEffects(IEffectsCollection* Collection, ICubeController * CubeController)
 {
 	Collection->AddEffect(new CTestEffect(CubeController));
+	Collection->AddEffect(new CFullMatrixEffect3D(CubeController));
+	Collection->AddEffect(new CTestClearEffect(CubeController));
 
+	Collection->AddEffect(new CEffectPlanes(CubeController));
+	Collection->AddEffect(new CEffectFullScreen(CubeController));
 
-	/*CEffectsCollection* cubeEffectCollection = new CEffectsCollection(CubeController);
+	CEffectsCollection* cubeEffectCollection = new CEffectsCollection(CubeController);
 	cubeEffectCollection->AddEffect(new CEffectExpandCubeToBorder(CubeController));
 	cubeEffectCollection->AddEffect(new CEffectCollapseCubeTo777(CubeController));
 	cubeEffectCollection->AddEffect(new CEffectExpandCubeFrom777To000(CubeController));
@@ -361,7 +421,8 @@ void AddEffects(IEffectsCollection* Collection, ICubeController * CubeController
 	cubeEffectCollection->AddEffect(new CEffectCollapseCubeFromToCenter(CubeController));
 	Collection->AddEffect(cubeEffectCollection);
 
-	Collection->AddEffect(new CEffectPlanes(CubeController));
 	Collection->AddEffect(new CEffectSpiral(CubeController));
-	Collection->AddEffect(new CEffectSnake(CubeController));*/
+	Collection->AddEffect(new CEffectFullScreen(CubeController));
+
+	Collection->AddEffect(new CEffectSnake(CubeController));
 }

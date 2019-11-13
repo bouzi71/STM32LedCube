@@ -26,10 +26,13 @@ public:
 	virtual void                                    SetLenght(uint32_t Value) override;
 	uint32_t                                        GetRepeatCount() const override;
 	virtual void                                    SetRepeatCount(uint32_t Value) override;
-	bool                                            IsNeedClearBeforeInit() const override;
-	bool                                            IsNeedClearBeforeFrame() const override;
+	virtual bool                                    IsNeedClearBeforeInit() const override;
+	virtual bool                                    IsNeedClearBeforeFrame() const override;
 
 protected:
+	virtual void 									LineX(uint32_t planeY, uint32_t planeZ);
+	virtual void 									LineY(uint32_t planeX, uint32_t planeZ);
+	virtual void 									LineZ(uint32_t planeX, uint32_t planeY);
 	virtual void 									PlaneX(uint32_t plane);
 	virtual void 									PlaneY(uint32_t plane);
 	virtual void 									PlaneZ(uint32_t plane);
@@ -37,8 +40,8 @@ protected:
 	virtual void 									CubeOutline(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd);
 
 protected:
-	void                                    		SetClearBeforeInit(bool Value);
-	void                                    		SetClearBeforeFrame(bool Value);
+	virtual void                                   	SetClearBeforeInit(bool Value);
+	virtual void                                    SetClearBeforeFrame(bool Value);
 
 private:
 	EFrameFuncPeriod								m_FramePeriod;
@@ -51,8 +54,6 @@ private:
 protected:
 	ICubeController *								m_CubeController;
 };
-
-
 
 
 #endif
