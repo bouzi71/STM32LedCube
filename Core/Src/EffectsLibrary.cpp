@@ -4,63 +4,44 @@
 
 // Additional
 #include <Effect.h>
+#include <Effect3D.h>
 #include <EffectsCollection.h>
 
-#include <vector>
 #include "Math/matrix4x4.h"
 #include <cmath>
 
-class CTestEffect : public CEffect
+class CTestEffect : public CEffect3D
 {
 public:
 	CTestEffect(ICubeController * CubeController)
-		: CEffect(CubeController)
+		: CEffect3D(CubeController)
 	{
 		SetFramePeriod(EFrameFuncPeriod_3);
 		SetLenght(25);
 
-		for (uint32_t x = 1; x <= 6; x++)
-			//for (uint32_t y = 1; y <= 6; y++)
-				for (uint32_t z = 1; z <= 6; z++)
-					if (true/*x == 1 || x == 6 || y == 1 || y == 6 || z == 1 || z == 6*/)
-					{
-						Vector3 p = Vector3(x, 7, z);
-						p /= 7.0f;
-						p -= cOffsetVector;
-						m_Fugure.push_back(p);
-					}
+		PlaneY(4);
 	}
 
-	void FuncFrame(uint32_t Frame) override final
+	bool FuncFrame3D(uint32_t Frame) override final
 	{
 		const float rotYValue = (3.14f / 25.0f) * float(Frame);
 
-		Matrix4 trMat;
-		Matrix4::Translation(Vector3(0.0f, 0.0f, 0.0f), trMat);
+		//Matrix4 trMat;
+		//Matrix4::Translation(Vector3(0.0f, 0.0f, 0.0f), trMat);
 
-		Matrix4 rotMat;
-		Matrix4::RotationY(rotYValue, rotMat);
+		Matrix4 rotMatX;
+		Matrix4::RotationX(rotYValue, rotMatX);
 
-		Matrix4 result = trMat * rotMat;
+		//Matrix4 rotMatZ;
+		//Matrix4::RotationZ(rotYValue, rotMatZ);
 
-		for (const auto& p : m_Fugure)
-		{
-			Vector3 pResult = p;
-			pResult *= result;
+		//Matrix4 scaleMat;
+		//Matrix4::Scaling(Vector3(0.7f, 1.0f, 0.7f), scaleMat);
 
-			pResult += cOffsetVector;
-			pResult *= 7.0f;
+		m_WorldMatrix = rotMatX;
 
-			SET_PIXEL(round(pResult.x), round(pResult.y), round(pResult.z))
-		}
+		return true;
 	}
-
-private:
-
-	Matrix4 m;
-	std::vector<Vector3> m_Fugure;
-
-	const Vector3 cOffsetVector = Vector3(0.5f, 0.5f, 0.5f);
 };
 
 

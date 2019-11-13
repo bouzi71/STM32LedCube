@@ -1,9 +1,12 @@
 #ifndef __EFFECT_H
 #define __EFFECT_H
 
-#include <stm32f1xx_hal.h>
-
 #include <Interfaces.h>
+
+#define SET_PIXEL(x, y, z)     (m_CubeController->GetMatrix()->SetPixel(x, y, z));
+#define CLEAR_PIXEL(x, y, z)   (m_CubeController->GetMatrix()->ClearPixel(x, y, z));
+#define TOGGLE_PIXEL(x, y, z)  (m_CubeController->GetMatrix()->TogglePixel(x, y, z));
+#define GET_PIXEL(x, y, z)     (m_CubeController->GetMatrix()->GetPixel(x, y, z))
 
 class CEffect
 	: public IEffect
@@ -27,19 +30,15 @@ public:
 	bool                                            IsNeedClearBeforeFrame() const override;
 
 protected:
-	void 											PlaneX(uint32_t plane);
-	void 											PlaneY(uint32_t plane);
-	void 											PlaneZ(uint32_t plane);
-	void 											Cube(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd);
-	void 											CubeOutline(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd);
+	virtual void 									PlaneX(uint32_t plane);
+	virtual void 									PlaneY(uint32_t plane);
+	virtual void 									PlaneZ(uint32_t plane);
+	virtual void 									Cube(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd);
+	virtual void 									CubeOutline(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint32_t yEnd, uint32_t zBegin, uint32_t zEnd);
 
-	void                                            SetClearBeforeInit(bool Value);
-	void                                            SetClearBeforeFrame(bool Value);
-
-#define SET_PIXEL(x, y, z)     (m_CubeController->GetMatrix()->SetPixel(x, y, z));
-#define CLEAR_PIXEL(x, y, z)   (m_CubeController->GetMatrix()->ClearPixel(x, y, z));
-#define TOGGLE_PIXEL(x, y, z)  (m_CubeController->GetMatrix()->TogglePixel(x, y, z));
-#define GET_PIXEL(x, y, z)     (m_CubeController->GetMatrix()->GetPixel(x, y, z))
+protected:
+	void                                    		SetClearBeforeInit(bool Value);
+	void                                    		SetClearBeforeFrame(bool Value);
 
 private:
 	EFrameFuncPeriod								m_FramePeriod;
@@ -52,5 +51,8 @@ private:
 protected:
 	ICubeController *								m_CubeController;
 };
+
+
+
 
 #endif

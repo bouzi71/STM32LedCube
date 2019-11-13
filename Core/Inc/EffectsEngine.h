@@ -1,8 +1,6 @@
 #ifndef __EFFECTSENGINE_H
 #define __EFFECTSENGINE_H
 
-#include <stm32f1xx_hal.h>
-
 #include <Interfaces.h>
 #include <EffectsCollection.h>
 

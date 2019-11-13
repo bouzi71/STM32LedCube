@@ -2,11 +2,6 @@
 // General
 #include <Effect.h>
 
-
-
-//
-// CEffect
-//
 CEffect::CEffect()
 {}
 
@@ -77,6 +72,21 @@ bool CEffect::IsNeedClearBeforeFrame() const
 //
 // Protected
 //
+void CEffect::SetClearBeforeInit(bool Value)
+{
+	m_CleanCubeBeforeInit = Value;
+}
+
+void CEffect::SetClearBeforeFrame(bool Value)
+{
+	m_CleanCubeBeforeFrame = Value;
+}
+
+
+
+//
+// Virtual protected
+//
 void CEffect::PlaneX(uint32_t plane)
 {
 	for (uint32_t y = 0; y < 8; y++)
@@ -114,14 +124,3 @@ void CEffect::CubeOutline(uint32_t xBegin, uint32_t xEnd, uint32_t yBegin, uint3
 				if (x == xBegin || x == xEnd || y == yBegin || y == yEnd || z == zBegin || z == zEnd)
 					SET_PIXEL(x, y, z);
 }
-
-void CEffect::SetClearBeforeInit(bool Value)
-{
-	m_CleanCubeBeforeInit = Value;
-}
-
-void CEffect::SetClearBeforeFrame(bool Value)
-{
-	m_CleanCubeBeforeFrame = Value;
-}
-

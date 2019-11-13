@@ -1,8 +1,6 @@
 #ifndef __LEDMATRIX_H
 #define __LEDMATRIX_H
 
-#include <stm32f1xx_hal.h>
-
 #include <Interfaces.h>
 
 class CLedMatrix

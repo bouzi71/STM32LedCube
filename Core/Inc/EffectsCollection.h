@@ -1,10 +1,8 @@
 #ifndef __EFFECTSCOLLECTION_H
 #define __EFFECTSCOLLECTION_H
 
-#include <stm32f1xx_hal.h>
-#include <vector>
-
 #include <Interfaces.h>
+#include <vector>
 
 class CEffectsCollection
 	: public IEffect
