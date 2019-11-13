@@ -29,21 +29,33 @@ void CLedMatrix::Fill()
 
 void CLedMatrix::SetPixel(uint8_t x, uint8_t y, uint8_t z)
 {
+	if (x > 7 || y > 7 || z > 7)
+		return;
+
 	m_Matrix[y][z] |=  (0x01 << x);
 }
 
 void CLedMatrix::ClearPixel(uint8_t x, uint8_t y, uint8_t z)
 {
+	if (x > 7 || y > 7 || z > 7)
+		return;
+
 	m_Matrix[y][z] &= ~(0x01 << x);
 }
 
 void CLedMatrix::TogglePixel(uint8_t x, uint8_t y, uint8_t z)
 {
+	if (x > 7 || y > 7 || z > 7)
+		return;
+
 	m_Matrix[y][z] ^=  (0x01 << x);
 }
 
 bool CLedMatrix::GetPixel(uint8_t x, uint8_t y, uint8_t z) const
 {
+	if (x > 7 || y > 7 || z > 7)
+		return false;
+
 	return (m_Matrix[y][z] & (0x01 << x)) == (0x01 << x);
 }
 
