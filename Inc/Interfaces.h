@@ -1,7 +1,7 @@
 #ifndef __INTERFACES_H
 #define __INTERFACES_H
 
-#include <stm32f4xx_hal.h>
+#include <stm32f1xx_hal.h>
 
 #include <memory>
 #include <cstring>

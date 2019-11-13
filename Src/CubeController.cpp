@@ -5,7 +5,7 @@
 // Additional
 #include <string.h>
 #include <main.h>
-#include <stm32f407xx.h>
+#include <stm32f1xx_hal_spi.h>
 
 // Defines
 #define ONE_FRAME_TIME (1000 / 60)
